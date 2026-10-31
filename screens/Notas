@@ -30,12 +30,7 @@ que si eres el admin que te aparezca la opcion para poder cambiarla de en proces
 -solo los administradores pueden aprobar los podcast y las peticiones.*
 --el aprobar puede ser simplemente que el admin se el unico que pueda ponerle la etiqueta de categoria de aprovado a la tarea en createtask y edittask--*
 
-
-
-
-
-cosas por hacer:
--regrearle la funcion de solo mostrar los videos a los reels como opcion del usuario y si lo dea-
+-regrearle la funcion de solo mostrar los videos a los reels como opcion del usuario y si lo dea-*
 -poder escribir en su muro para poder hacer testimonios
 -si no tengo seleccionado ninguna tema que me aparezcan todas las tareas(primordial)*
 -quitar que se compartan historias de 24hrs en historias de aportaciones*
@@ -45,64 +40,71 @@ cosas por hacer:
 -bonerle un contador a todo y que sean visible dependiendo el modo de apoyo que tenga el usuario *
 -que el menu tenga solamente inicio, tareas, reels, mensajes y notificaciones y perfil *
 -el inciio tendra las tareas en general y la de tareas tendra la de tus favoritos con opcion de poner en modo general en el filtro*
--poder ver como si estuviese en el perfil de esa persona o ver la actividad del usuario como tambien poder ver a los que les ah recomendado o verificado o etc. y que lo pueda ocultar o no
 -que puedas seleccionar bien cual tarea llevar a taskdetail, la que se compartio o la original*
 -que el inicio muestre el top de cada tema *
--que en perfil se vean tus redes sociales y todos los contadores necesarios
--ver donde ah comentado esa persona
--que se vea mejor taskscreen las imagenes y videos
--que todos los contadores sean visibles en su funcion del modal junto con sus insignias(osea que en casi todos los lugares de la app hay contadores, likes, etc. como cualquier red social y al mostrarlos en su modal, que se muestren las opciiones de filtrar los usuarios dependiendo sus insignias, asi como cuando los likes tienen reacciones y filtrar entre ellos como en cualquier red social, pues qui vamos a filtrar entre sus insignias)
--bloquear gente,
--regresar la funcion de comentar una tarea de tus favoritas por que te parece que ya hay una tarea que ya existe pero mejor explicada(referencias)
+-que todos los contadores sean visibles en su funcion del modal junto con sus insignias(osea que en casi todos los lugares de la app hay contadores, likes, etc. como cualquier red social y al mostrarlos en su modal, que se muestren las opciiones de filtrar los usuarios dependiendo sus insignias, asi como cuando los likes tienen reacciones y filtrar entre ellos como en cualquier red social, pues qui vamos a filtrar entre sus insignias)*
+-bloquear gente,*
+-regresar la funcion de comentar una tarea de tus favoritas por que te parece que ya hay una tarea que ya existe pero mejor explicada(referencias)*
 -que se apague la reproduccion al dejar de estar en ese video*
 -categoria mas especificas para cada aportacion(consejo, peticion, historia)*
+-anclar guardados y anclar favoritos en perfiles o cualquier lugar y tener la opcion de ocultarlos o no *
+-acomodar todos los botones basicos en el inicio o tareas*
+-botones en taskdetail como impulsar compartir y guardar(la publicacion debe ser casi identica a la que se renderiza en taskscreen)*
+-input de decripcion mas inteligente tipo que puedas poner cualquier link, etiquetar, hashtags, vermas... etc,
+-regresarle el traductor a los mensajes directos(primordial)*
+-agregarle el filtro a los foros*
+-descargar*
+-bien ahora para poder hacer la siguiente funcion de notificar al que ah sido mencionado en una publicacion con la categoria de Grabar Podcast. debemos de crear la funcion de etiquetar ah alguien en una publicacion para despues poder mencionar ah alguien en una publicacion en la decripcion o en un comentario. asi que comencemos con la etiqueta comun de las redes sociales en una publicacion de una o varias personas
+y notificar al usuario cuando se haya decidido hacer el podcast
+(esta ya se hizo pero se debe expandir no solo a eso si no tambien a todo en general y con eso me refiero ah que tambien puedas notificar si su peticion fue aprobada y notificar a los admins cuando una peticion esta en las toop 5 o ah llegado al top de las aportaciones con mas likes en ese mes )*
+-etiquetar en comentarios*
+-poderle agregar subtema al subtema en createtask y en buscar(en buscar ya se hizo pero createtask debe de estar muy bien en sincroinia con los filtros de las categorias y subcategorias al igual que todo)
+-arreglar el boton de regresar de notificaciones y de todos los  lugares(el boton de regresar debe ser inteligenet en cualquier pantalla en la que este, se debe de regresar a la que estaba no importa desde donde ah sido llamado el nuevo componente sin daña el estado anterior del componente en el que estaba, se supone que asi debe de funcionar un boton de regresar)*
+-que al crear una tarea con categoria de grabar podcast que automaticamente tenga el subtema en procesando y que no aparezca el aprovado, amenos *
+-categoria de Aprobadas que solo lo pueda poner los admin*
+-mostrar los likes del perfil*
+-al no haber una PCH seleccionada que aparezcan las 3 al mismo tiempo(primordial)*
+-osea que se debe de poder editar el feed de cuando se selecciona ver los favoritos de algun perfil o tarea,
+--tambien poderlo poner como opcion al crear una tarea si quieres compartirla ya o solo ver como quedaria compartida en tu perfil en modo oculto-*
+-mejor el filtro para que muestre las tareas que no se repiten del usuario seleccionado *
+-agregarle al contador de impulsar el modal de likes de las tareas al usuario en session*
+-Compartir una tarea sin publicarla todavía, como vista previa privada.*
+-Bloquear usuarios.*
+-Separar y mejorar la visualización de imágenes/videos en Reels y TasksScreen.
+-3 verificados verifican, recomendados con uno o historial de verificacion *
+-categorias en guardadas*
+-notificarme si lo decido cuando la aportacion es aceptada*
+
+
+
+
+cosas por hacer:
+-que en perfil se vean tus redes sociales y todos los contadores necesarios
+-ver donde ah comentado esa persona
+-poder ver como si estuviese en el perfil de esa persona o ver la actividad del usuario como tambien poder ver a los que les ah recomendado o verificado o etc. y que lo pueda ocultar o no
+-que se vea mejor taskscreen las imagenes y videos
 -que aparesca el proximo recomendado por el anterior grabado en el pocast
 -mis guardados y mis favoritos y que todo se guarde para crear un contador de cada uno y mostraselo al creador de la tarea(estadisticas)
--anclar guardados y anclar favoritos en perfiles o cualquier lugar y tener la opcion de ocultarlos o no 
 -que puedas anclar tus guardados eh inluso anclar en favoritos y tener la opcion de mostrar o no tus favoritos
 -poder crear colecciones para guardar por albums creados por el usuario
 -mejorar todo el inicio para que se vean bien las tareas
--acomodar todos los botones basicos en el inicio o tareas*
--botones en taskdetail como impulsar compartir y guardar(la publicacion debe ser casi identica a la que se renderiza en taskscreen)*
 -elegir entre renderizar global o solo de tus amigos 
 -perfiles recomendados por la app
 -mostrar su actividad de likes(no es primordial)
 -que puedas ver como si estuvieses en el perfil seleccionado si es que el usuario lo permite(no es primordial)
 -consejo anterior o posterior que recomiendo despues de este
--mostrar en mi perfil  cuantos perfiles ah sido compartido mi perfil
+-mostrar en mi perfil  cuantos perfiles ah sido compartido en favoritos mi perfil
 -Componente mas grande y especifico solo para las categorias para que tengan imagenes y se describan mejor(no es primordial)
 -que lo que recomiendes o verifiques o lo que sea, que aparezcan en tu perfil si lo deseas o no(primordial)
--input de decripcion mas inteligente tipo que puedas poner cualquier link, etiquetar, hashtags, vermas... etc,
--regresarle el traductor a los mensajes directos(primordial)*
--agregarle el filtro a los foros
--descargar
 -visitas que tiene el perfil en el modo de paga(no es primordial)
 -consejo anterior y posterior 
 -enlistar todas las acciones y mostrarlas en modo paga o no (no es primordial)
 -historial de comentarios(no es primordial)
--bien ahora para poder hacer la siguiente funcion de notificar al que ah sido mencionado en una publicacion con la categoria de Grabar Podcast. debemos de crear la funcion de etiquetar ah alguien en una publicacion para despues poder mencionar ah alguien en una publicacion en la decripcion o en un comentario. asi que comencemos con la etiqueta comun de las redes sociales en una publicacion de una o varias personas
-y notificar al usuario cuando se haya decidido hacer el podcast
-(esta ya se hizo pero se debe expandir no solo a eso si no tambien a todo en general y con eso me refiero ah que tambien puedas notificar si su peticion fue aprobada y notificar a los admins cuando una peticion esta en las toop 5 o ah llegado al top de las aportaciones con mas likes en ese mes )
--etiquetar en comentarios
--poderle agregar subtema al subtema en createtask y en buscar(en buscar ya se hizo pero createtask debe de estar muy bien en sincroinia con los filtros de las categorias y subcategorias al igual que todo)
--arreglar el boton de regresar de notificaciones y de todos los  lugares(el boton de regresar debe ser inteligenet en cualquier pantalla en la que este, se debe de regresar a la que estaba no importa desde donde ah sido llamado el nuevo componente sin daña el estado anterior del componente en el que estaba, se supone que asi debe de funcionar un boton de regresar)
--que al crear una tarea con categoria de grabar podcast que automaticamente tenga el subtema en procesando y que no aparezca el aprovado, amenos 
--categoria de Aprobadas que solo lo pueda poner los admin
--mostrar los likes del perfil
 -como admin puedes borrar tareas
--al no haber una PCH seleccionada que aparezcan las 3 al mismo tiempo(primordial)*
 -ajustar bien el video e imagen al reel y taskscreen
 -ubicacion
 --regresar la funcion de ver la descripcion de quien ah compartido esa tarea en reels ya sea tus favoritos o global-
 -y la funcion de anclar todo tambien, en tus perfiles favoritos, tareas favoritas y que el usuario pueda elegir entre ponerlo en modo oculto al publico o no
--osea que se debe de poder editar el feed de cuando se selecciona ver los favoritos de algun perfil o tarea,
---tambien poderlo poner como opcion al crear una tarea si quieres compartirla ya o solo ver como quedaria compartida en tu perfil en modo oculto-
--mejor el filtro para que muestre las tareas que no se repiten del usuario seleccionado 
--agregarle al contador de impulsar el modal de likes de las tareas al usuario en session
--Compartir una tarea sin publicarla todavía, como vista previa privada.
--Bloquear usuarios.
--Separar y mejorar la visualización de imágenes/videos en Reels y TasksScreen.
--3 verificados verifican, recomendados con uno o historial de verificacion 
 -El Modo "Ver como Usuario Seleccionado" (Infiltrarse en el Feed de Otro Perfil)
 -like de la app o compania
 -Segmentación Temporal del Feed (top_day, top_week, top_month)
@@ -113,24 +115,15 @@ top_month: Lo más votado del mes.
 En la versión moderna: El modal de filtros de TasksScreen.js redujo o no tiene conectados de forma directa estos períodos dinámicos de votación temporal.
 -comentari una aportacion de tus favoritas o guardadas
 y que si tiene que em tasescreen tambien se vea reflejada la cantidad de cuantas alla
--categorias en guardadas
 foro privado 
 
 -anclaje especifico por categoria
--notificarme si lo decido cuando la aportacion es aceptada
+
+ compartir en otra redes sociales
+
+ ocultar mi tarea
+
+ componeten de top el segundo en el menu inferior que tambien el top de tus perfiles favoritos y categorias
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-este es un cambio 
-
+ loguea con google
