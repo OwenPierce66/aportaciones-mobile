@@ -146,3 +146,35 @@ export function withCustomPaths(nodes, paths) {
   });
   return result;
 }
+
+/**
+ * Hijos de `name` en un árbol unido (`mergeCategoryTrees`), en cualquier nivel. Si el mismo
+ * nombre está en varias ramas, junta los hijos de todas.
+ */
+export function childNamesOf(nodes, name) {
+  const key = categoryKey(name);
+  const parents = new Set((nodes || []).filter((node) => categoryKey(node.name) === key).map((node) => node.id));
+  const names = (nodes || []).filter((node) => node.parent && parents.has(node.parent)).map((node) => node.name);
+  return categoryPath(names);
+}
+
+/**
+ * Ruta completa (['Tema', 'Subtema', ...]) del nodo llamado `name` en un árbol unido.
+ * Si el nombre está en varias ramas, prefiere la rama cuyos niveles están en `selected`
+ * (lo que ya se eligió). Si no está en el árbol, es un tema principal: [name].
+ */
+export function pathOfName(nodes, name, selected = []) {
+  const byId = new Map((nodes || []).map((node) => [node.id, node]));
+  const pathFor = (node) => {
+    const names = [];
+    for (let current = node; current; current = current.parent ? byId.get(current.parent) : null) {
+      names.unshift(current.name);
+    }
+    return names;
+  };
+  const key = categoryKey(name);
+  const chosen = new Set(categoryPath(selected).map(categoryKey));
+  const paths = (nodes || []).filter((node) => categoryKey(node.name) === key).map(pathFor);
+  if (!paths.length) return categoryPath([name]);
+  return paths.find((path) => path.every((part) => chosen.has(categoryKey(part)))) || paths[0];
+}

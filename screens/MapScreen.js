@@ -1,23 +1,34 @@
 /**
  * screens/MapScreen.js
  *
- * Pestaña Mapa: Google Maps con el punto azul y el botón "mi ubicación". Al abrirla pide
+ * Pestaña Mapa: Google Maps con el punto azul, el botón "mi ubicación" y un pin por cada
+ * aportación compartida desde una ubicación (al tocarlo sale su tarjeta). Al abrirla pide
  * el permiso y se centra en la persona. La versión web está en MapScreen.web.js, porque
  * react-native-maps no funciona en el navegador.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { useFocusEffect } from '@react-navigation/native';
 import LocationNotice from '@components/LocationNotice';
+import MapTaskCard from '@components/MapTaskCard';
+import { useMapTasks } from '@hooks/useApi';
 import { useUserLocation } from '@hooks/useUserLocation';
+import { pinColor } from '../utils/currentLocation';
 import { DEFAULT_REGION, StarLightTheme, USER_REGION_DELTA } from '../utils/mapConfig';
+import { openMapTask } from './mapNavigation';
 
-const MapScreen = () => {
+const MapScreen = ({ navigation }) => {
   const mapRef = useRef(null);
   const location = useUserLocation();
   const { status, coords } = location;
   // Android solo los activa si el permiso ya está concedido.
   const granted = status === 'granted';
+  const { data: tasks = [], refetch } = useMapTasks();
+  const [selected, setSelected] = useState(null);
+
+  // Al volver a la pestaña (p. ej. después de publicar) se recargan los pines.
+  useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
 
   useEffect(() => {
     if (!coords) return;
@@ -39,7 +50,18 @@ const MapScreen = () => {
         showsMyLocationButton={granted}
         showsCompass
         rotateEnabled
-      />
+        onPress={() => setSelected(null)}
+      >
+        {tasks.map((task) => (
+          <Marker
+            key={task.id}
+            coordinate={{ latitude: task.latitude, longitude: task.longitude }}
+            pinColor={pinColor(task.pch)}
+            onPress={(event) => { event?.stopPropagation?.(); setSelected(task); }}
+          />
+        ))}
+      </MapView>
+      <MapTaskCard task={selected} onOpen={(task) => openMapTask(navigation, task)} onClose={() => setSelected(null)} />
       <LocationNotice location={location} />
     </View>
   );

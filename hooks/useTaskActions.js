@@ -143,6 +143,18 @@ export default function useTaskActions({
     }
   }, [targetUser, refresh, close]);
 
+  // Like de la App: mi like marcado como de la App (el menú solo lo muestra a staff y admins).
+  const toggleAppLike = useCallback(async () => {
+    if (!sourceTask?.id) return;
+    close?.();
+    try {
+      await api.post(`admin/tasks/${sourceTask.id}/like/`, { liked: !sourceTask.app_has_liked });
+      await refresh?.();
+    } catch (error) {
+      Alert.alert('No se pudo cambiar el like de la App', error.response?.data?.detail || 'Intenta de nuevo.');
+    }
+  }, [sourceTask?.id, sourceTask?.app_has_liked, close, refresh]);
+
   const approvePodcast = useCallback(() => {
     if (!sourceTask?.id) return;
     const approve = async () => {
@@ -211,6 +223,7 @@ export default function useTaskActions({
     toggleProfileFavorite,
     toggleVerified,
     toggleRecommended,
+    toggleAppLike,
     approvePodcast,
     edit,
     delete: remove,

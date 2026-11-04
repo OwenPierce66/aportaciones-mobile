@@ -12,7 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import api, { getImageUrl } from '@api';
-import { setAccountActive, setAccountStaff } from '../utils/adminActions';
+import { setAccountActive, setAccountRole, setAccountStaff } from '../utils/adminActions';
 import { AuthContext } from '@app';
 import SideMenu from '@components/SideMenu';
 import ReportContentButton from '@components/ReportContentButton';
@@ -418,8 +418,9 @@ const ProfileScreen = ({ route, navigation }) => {
     updateProfileControls({ showFilterAdd: !profileControls.showFilterAdd });
   };
 
-  // ── Moderación (solo superadmin, sobre perfiles ajenos) ───────────────────
+  // ── Moderación (sobre perfiles ajenos): el staff solo verifica; lo demás es del superadmin ──
   const isSuperAdmin = Boolean(sessionUser?.is_superuser);
+  const isStaffOrAdmin = isSuperAdmin || Boolean(sessionUser?.is_staff);
   const adminState = socialStats?.admin_state;
   const adminTargetName = user?.username || route?.params?.userName || '';
 
@@ -456,6 +457,11 @@ const ProfileScreen = ({ route, navigation }) => {
   const adminToggleStaff = () => {
     setProfileMenuVisible(false);
     setAccountStaff(socialUserId, adminTargetName, !adminState?.is_staff, afterAdminChange);
+  };
+
+  const adminToggleSuperuser = () => {
+    setProfileMenuVisible(false);
+    setAccountRole(socialUserId, adminTargetName, 'is_superuser', !adminState?.is_superuser, afterAdminChange);
   };
 
   const openRecommendedProfile = useCallback((person) => {
@@ -1304,7 +1310,7 @@ const ProfileScreen = ({ route, navigation }) => {
                 {showActivity ? 'Dejar de ver la actividad' : 'Ver actividad en el perfil'}
               </Text>
             </TouchableOpacity>
-            {isSuperAdmin && !isCurrentUser && adminState ? (
+            {isStaffOrAdmin && !isCurrentUser && adminState ? (
               <>
                 <Text style={styles.profileMenuSection}>Administración</Text>
                 <TouchableOpacity style={styles.profileMenuOption} onPress={adminToggleVerified}>
@@ -1317,6 +1323,8 @@ const ProfileScreen = ({ route, navigation }) => {
                     {adminState.is_verified ? 'Quitar verificación' : 'Verificar perfil'}
                   </Text>
                 </TouchableOpacity>
+                {isSuperAdmin ? (
+                <>
                 <TouchableOpacity style={styles.profileMenuOption} onPress={adminToggleRecommended}>
                   <Ionicons
                     name={adminState.is_recommended ? 'ribbon' : 'ribbon-outline'}
@@ -1346,6 +1354,14 @@ const ProfileScreen = ({ route, navigation }) => {
                       </Text>
                     </TouchableOpacity>
                   </>
+                ) : null}
+                <TouchableOpacity style={styles.profileMenuOption} onPress={adminToggleSuperuser}>
+                  <Ionicons name="shield-checkmark-outline" size={20} color="#845ef7" />
+                  <Text style={styles.profileMenuText}>
+                    {adminState.is_superuser ? 'Quitar admin' : 'Hacer admin'}
+                  </Text>
+                </TouchableOpacity>
+                </>
                 ) : null}
               </>
             ) : null}

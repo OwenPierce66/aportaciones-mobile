@@ -208,6 +208,8 @@ const TasksScreen = ({ navigation, route }) => {
   const [selectedFollowedUsersOnly, setSelectedFollowedUsersOnly] = useState(false);
   const [selectedVerifiedUsersOnly, setSelectedVerifiedUsersOnly] = useState(false);
   const [selectedRecommendedUsersOnly, setSelectedRecommendedUsersOnly] = useState(false);
+  const [selectedAppLikedOnly, setSelectedAppLikedOnly] = useState(false);
+  const [selectedAdminUsersOnly, setSelectedAdminUsersOnly] = useState(false);
 
   const [availableCategories, setAvailableCategories] = useState([]);
   const [showPersonalFilter, setShowPersonalFilter] = useState(false);
@@ -651,8 +653,8 @@ const TasksScreen = ({ navigation, route }) => {
     }
   };
 
-  // ⚡ Like de la App (de peticiones.js en la web): el backend lo da con la cuenta de la App
-  // (owen@gmail.com). Solo superadmins, igual que el endpoint.
+  // ⚡ Like de la App: es mi propio like marcado como de la App (sale en la pestaña App de la
+  // lista, con mi nombre). Solo staff y superadmins, igual que el endpoint.
   const handleToggleAppLike = async () => {
     if (!selectedActionTask) return;
     const sourceTask = selectedActionTask.isSharedTask ? selectedActionTask.task : selectedActionTask;
@@ -661,16 +663,10 @@ const TasksScreen = ({ navigation, route }) => {
 
     try {
       const { data } = await api.post(`admin/tasks/${sourceTask.id}/like/`, { liked: !sourceTask.app_has_liked });
-      // Si quien administra es la propia cuenta de la App, también cambia su corazón.
-      const isAppAccount = String(data.app_account_id) === String(currentUserId);
+      // Es mi like: también cambia mi corazón.
       const updateTask = (task) => (
         task?.id === sourceTask.id
-          ? {
-            ...task,
-            app_has_liked: data.liked,
-            likes_count: data.likes_count,
-            ...(isAppAccount && { user_has_liked: data.liked }),
-          }
+          ? { ...task, app_has_liked: data.liked, likes_count: data.likes_count, user_has_liked: data.liked }
           : task
       );
       setTasks(current => current.map(updateTask));
@@ -816,10 +812,12 @@ const TasksScreen = ({ navigation, route }) => {
     followed_users_only: selectedFollowedUsersOnly,
     verified_users_only: selectedVerifiedUsersOnly,
     recommended_users_only: selectedRecommendedUsersOnly,
+    app_liked_only: selectedAppLikedOnly,
+    admin_users_only: selectedAdminUsersOnly,
     as_user: viewAs?.id,
   }), [tema, selectedCategory, selectedStatus, selectedDateFilter, selectedSortBy,
       selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly,
-      viewAs]);
+      selectedAppLikedOnly, selectedAdminUsersOnly, viewAs]);
 
   // ─── React Query: Tareas ─────────────────────────────────────────────────
   const {
@@ -884,7 +882,8 @@ const TasksScreen = ({ navigation, route }) => {
     tasksRefetch();
     sharedRefetch();
   }, [tema, selectedCategory, selectedStatus, selectedDateFilter, selectedSortBy,
-      selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly]));
+      selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly,
+      selectedAppLikedOnly, selectedAdminUsersOnly]));
 
   const onRefresh = useCallback(() => {
     tasksRefetch();
@@ -902,6 +901,8 @@ const TasksScreen = ({ navigation, route }) => {
     setSelectedFollowedUsersOnly(newFilters.followed_users_only ?? false);
     setSelectedVerifiedUsersOnly(newFilters.verified_users_only ?? false);
     setSelectedRecommendedUsersOnly(newFilters.recommended_users_only ?? false);
+    setSelectedAppLikedOnly(newFilters.app_liked_only ?? false);
+    setSelectedAdminUsersOnly(newFilters.admin_users_only ?? false);
     setFilterModalVisible(false);
   }, []);
 
@@ -922,6 +923,8 @@ const TasksScreen = ({ navigation, route }) => {
       followedUsersOnly: selectedFollowedUsersOnly,
       verifiedUsersOnly: selectedVerifiedUsersOnly,
       recommendedUsersOnly: selectedRecommendedUsersOnly,
+      appLikedOnly: selectedAppLikedOnly,
+      adminUsersOnly: selectedAdminUsersOnly,
     });
     const cached = searchCacheRef.current.get(cacheKey);
     if (cached) {
@@ -956,6 +959,8 @@ const TasksScreen = ({ navigation, route }) => {
         followed_users_only: selectedFollowedUsersOnly,
         verified_users_only: selectedVerifiedUsersOnly,
         recommended_users_only: selectedRecommendedUsersOnly,
+        app_liked_only: selectedAppLikedOnly,
+        admin_users_only: selectedAdminUsersOnly,
       };
       const [tasksResponse, sharedResponse] = searchScope === 'profiles'
         ? [{ data: [] }, { data: [] }]
@@ -981,7 +986,7 @@ const TasksScreen = ({ navigation, route }) => {
     } finally {
       setSearchLoading(false);
     }
-  }, [tema, searchCategory, searchStatus, selectedDateFilter, selectedSortBy, selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly, searchScope]);
+  }, [tema, searchCategory, searchStatus, selectedDateFilter, selectedSortBy, selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly, selectedAppLikedOnly, selectedAdminUsersOnly, searchScope]);
 
   useEffect(() => {
     if (!searchExpanded || !searchHasStarted) return undefined;
@@ -1283,6 +1288,8 @@ const TasksScreen = ({ navigation, route }) => {
     && !selectedFollowedUsersOnly
     && !selectedVerifiedUsersOnly
     && !selectedRecommendedUsersOnly
+    && !selectedAppLikedOnly
+    && !selectedAdminUsersOnly
     && ['all', 'recent'].includes(selectedSortBy);
   const filteredTasks = displayedFeedItems.filter((item) => {
     if (searchExpanded && searchHasStarted) return true;
@@ -1892,6 +1899,8 @@ const TasksScreen = ({ navigation, route }) => {
         currentFollowedUsers={selectedFollowedUsersOnly}
         currentVerifiedUsers={selectedVerifiedUsersOnly}
         currentRecommendedUsers={selectedRecommendedUsersOnly}
+        currentAppLiked={selectedAppLikedOnly}
+        currentAdminUsers={selectedAdminUsersOnly}
         // ✅ PASAMOS EL ESTADO DE ADMIN DIRECTAMENTE
         isSuperAdmin={isAdmin}
         // ✅ SOLUCIÓN: Pasamos las categorías como prop.
@@ -1965,6 +1974,8 @@ const TasksScreen = ({ navigation, route }) => {
           followed_users_only: selectedFollowedUsersOnly,
           verified_users_only: selectedVerifiedUsersOnly,
           recommended_users_only: selectedRecommendedUsersOnly,
+          app_liked_only: selectedAppLikedOnly,
+          admin_users_only: selectedAdminUsersOnly,
         }}
         onApplyFilter={applyFilters}
       />

@@ -8,7 +8,7 @@ import FollowHeart from '../components/FollowHeart';
 import { TIER_META, getTierKey } from '../utils/likeTiers';
 
 // Orden de las pestañas (la regla de insignias y sus colores se comparte con los reels).
-const TIER_ORDER = ['all', 'app', 'recommended', 'sub_red', 'verified', 'sub_green', 'regular'];
+const TIER_ORDER = ['all', 'app', 'staff', 'recommended', 'sub_red', 'verified', 'sub_green', 'regular'];
 
 const TieredLikesModal = ({ visible, onClose, apiUrl, initialTier = 'all', title = "Usuarios", navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ const TieredLikesModal = ({ visible, onClose, apiUrl, initialTier = 'all', title
   };
 
   const tierCounts = React.useMemo(() => {
-    const counts = { all: users.length, verified: 0, recommended: 0, app: 0, sub_red: 0, sub_green: 0, regular: 0 };
+    const counts = { all: users.length, verified: 0, recommended: 0, app: 0, staff: 0, sub_red: 0, sub_green: 0, regular: 0 };
     users.forEach(u => {
       const key = getTierKey(u);
       if (counts[key] !== undefined) {
@@ -73,7 +73,10 @@ const TieredLikesModal = ({ visible, onClose, apiUrl, initialTier = 'all', title
     const userObject = item.user || item;
     const tierKey = getTierKey(userObject);
     const tierColor = TIER_META[tierKey]?.color || '#868e96';
-    const userName = userObject.username || userObject.name || userObject.user?.username || 'Usuario';
+    // Un like de la App (`is_app`) lleva el nombre de quien lo dio y la etiqueta App;
+    // la cuenta de la App no tiene usuario: se muestra como "App".
+    const userName = userObject.username || userObject.name || userObject.user?.username
+      || (userObject.is_app ? TIER_META.app.label : 'Usuario');
     const userId = userObject.id || userObject.user?.id;
     const userImage = userObject.profile?.user_image || userObject.user_image || userObject.image || userObject.user?.user_image;
 
@@ -88,7 +91,14 @@ const TieredLikesModal = ({ visible, onClose, apiUrl, initialTier = 'all', title
           style={styles.userNameCell}
           textStyle={styles.username}
         />
-        {tierKey !== 'regular' ? (
+        {/* Staff y admins llevan la etiqueta App aunque su like sea normal; la pestaña App
+            solo cuenta los likes dados como la App (`is_app`). */}
+        {tierKey === 'staff' ? (
+          <View style={[styles.tierBadge, { backgroundColor: TIER_META.app.color }]}>
+            <Text style={styles.tierBadgeText}>{TIER_META.app.label}</Text>
+          </View>
+        ) : null}
+        {tierKey !== 'regular' && tierKey !== 'staff' ? (
           <View style={[styles.tierBadge, { backgroundColor: tierColor }]}>
             <Text style={styles.tierBadgeText}>{TIER_META[tierKey].label}</Text>
           </View>

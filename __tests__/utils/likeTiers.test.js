@@ -16,9 +16,15 @@ describe('insignias', () => {
       { id: 'e', profile: {} },
     ];
     expect(makeTierCounts(users)).toEqual({
-      all: 5, app: 0, recommended: 1, verified: 1, sub_red: 1, sub_green: 1, regular: 1,
+      all: 5, app: 0, staff: 0, recommended: 1, verified: 1, sub_red: 1, sub_green: 1, regular: 1,
     });
-    expect(getTierKey({ username: 'app-bot' })).toBe('app');
+    // Solo cuenta lo que marca el backend, no el nombre de usuario.
+    expect(getTierKey({ username: 'owen', is_app: true })).toBe('app');
+    expect(getTierKey({ username: 'owen' })).toBe('regular');
+    expect(getTierKey({ username: 'jefa', is_superuser: true })).toBe('staff');
+    // Staff con like normal: pestaña Staff; si lo dio como la App, pestaña App.
+    expect(getTierKey({ id: 's', is_app_member: true, profile: { is_verified: true } })).toBe('staff');
+    expect(getTierKey({ id: 's', is_app: true, is_app_member: true })).toBe('app');
   });
 });
 

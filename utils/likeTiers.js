@@ -2,12 +2,13 @@
  * Insignias de quien da like, comparte o sigue: definen el color de los números por nivel
  * en los reels y las pestañas de la lista (TieredLikesModal). Una sola regla para ambos.
  */
-export const TIER_KEYS = ['app', 'recommended', 'verified', 'sub_red', 'sub_green', 'regular'];
+export const TIER_KEYS = ['app', 'staff', 'recommended', 'verified', 'sub_red', 'sub_green', 'regular'];
 
 export const TIER_META = {
   verified: { label: 'Verificados', color: '#4dabf7' },
   recommended: { label: 'Recomendados', color: '#f59f00' },
   app: { label: 'App', color: '#000' },
+  staff: { label: 'Staff', color: '#845ef7' },
   sub_red: { label: 'Suscripción +', color: '#ff6b6b' },
   sub_green: { label: 'Suscripción', color: '#51cf66' },
   regular: { label: 'Otros', color: '#868e96' },
@@ -16,9 +17,10 @@ export const TIER_META = {
 
 export const getTierKey = (user) => {
   const profile = user?.profile || user || {};
-  const username = String(user?.username || user?.user?.username || '').toLowerCase();
-  const userId = user?.id || user?.user?.id;
-  if (user?.is_app || username === 'app-bot' || username === 'owen' || userId === 1) return 'app';
+  // El backend marca la cuenta de la App y los likes dados como la App (`is_app`).
+  if (user?.is_app) return 'app';
+  // Staff y admins (en los likes de tareas, los que dieron like normal y no como la App).
+  if (user?.is_app_member || user?.is_staff || user?.is_superuser) return 'staff';
   if (profile.is_recommended) return 'recommended';
   if (profile.subscriptionActive && parseFloat(profile.subscription_amount || 0) >= 8) return 'sub_red';
   if (profile.is_verified) return 'verified';

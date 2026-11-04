@@ -1,5 +1,7 @@
 ﻿module.exports = {
   preset: 'jest-expo',
+  // Algunas pantallas grandes tardan más de 5 s en montarse la primera vez (sin caché).
+  testTimeout: 20000,
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|@sentry/.*|sentry-expo|@tanstack/.*|react-native-reanimated|react-native-gesture-handler|react-native-encrypted-storage)',
   ],

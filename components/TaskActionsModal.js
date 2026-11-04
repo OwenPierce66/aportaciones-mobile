@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getActionTaskInfo } from '@hooks/useTaskActions';
 import { useMe } from '@hooks/useApi';
 import { useDownloadTask } from '@hooks/useDownloadTask';
-import { setAccountActive } from '../utils/adminActions';
+import { setAccountActive, setAccountRole } from '../utils/adminActions';
 import PetitionSupportSheet from './PetitionSupportSheet';
 import { useMyRelations } from '../hooks/useMyRelations';
 import useProfileActions from '../hooks/useProfileActions';
@@ -49,7 +49,8 @@ async function shareToStory(task, item) {
  *
  * actionTask: tarea normal, o compartida marcada con `isSharedTask: true`.
  * handlers: { pinFavorite(kind), viewShares (opcional), directMessage, goToForum, toggleFollow, toggleProfileFavorite,
- *             edit, delete, approvePodcast, toggleVerified, toggleRecommended, toggleAppLike (opcional, superadmin) }
+ *             edit, delete, approvePodcast, toggleVerified, toggleRecommended, toggleAppLike (opcional, staff) }
+ * Hacer o quitar staff / admin al autor lo resuelve el propio menú (solo superadmin).
  * Guardar / favoritos / top 5 (general y por categoría) / "solo para mí" de la tarea los resuelve el
  * propio menú con el estado compartido de `useMyRelations`.
  * Siempre incluye "Descargar" (imágenes y videos de la aportación original) y, en peticiones,
@@ -85,7 +86,25 @@ const TaskActionsModal = ({
       setCategoryPinsOpen(false);
     }
   }, [visible]);
-  const canSuspendAuthor = Boolean(me?.is_superuser) && isOtherUser && Boolean(targetUser?.id) && !targetUser?.is_superuser;
+  // Rol del autor tras cambiarlo desde este menú (los datos de la tarea no se recargan).
+  const [roleOverrides, setRoleOverrides] = useState({});
+  const targetRole = {
+    is_staff: Boolean(targetUser?.is_staff),
+    is_superuser: Boolean(targetUser?.is_superuser),
+    ...roleOverrides[targetUser?.id],
+  };
+  const canManageRoles = Boolean(me?.is_superuser) && isOtherUser && Boolean(targetUser?.id);
+  const canSuspendAuthor = canManageRoles && !targetRole.is_superuser;
+  const changeAuthorRole = (role, value) => {
+    const userId = targetUser.id;
+    onClose?.();
+    setAccountRole(userId, targetUser.username || targetUser.first_name || '', role, value, (data) => {
+      setRoleOverrides((current) => ({
+        ...current,
+        [userId]: { is_staff: data.is_staff, is_superuser: data.is_superuser },
+      }));
+    });
+  };
   // Seguir / favorito / top 5 del perfil: el mismo estado que el corazón (los datos de la tarea pueden ser viejos).
   const profileActions = useProfileActions(targetUser, { onBefore: onClose });
   const { isFollowing, isFavorited: isProfileFavorited, isPinned: isProfilePinned } = profileActions;
@@ -360,7 +379,7 @@ const TaskActionsModal = ({
                       </Text>
                     </TouchableOpacity>
                   ) : null}
-                  {me?.is_superuser && handlers.toggleAppLike ? (
+                  {handlers.toggleAppLike ? (
                     <TouchableOpacity style={styles.actionOption} onPress={handlers.toggleAppLike}>
                       <Ionicons name={sourceTask?.app_has_liked ? 'heart-dislike-outline' : 'heart-circle-outline'} size={20} color="#ff6b6b" />
                       <Text style={styles.actionText}>{sourceTask?.app_has_liked ? 'Quitar like de la App' : 'Dar like como la App'}</Text>
@@ -374,14 +393,37 @@ const TaskActionsModal = ({
                     />
                     <Text style={styles.actionText}>{targetUser?.profile?.is_verified ? 'Quitar Verificación' : 'Verificar Perfil'}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionOption} onPress={handlers.toggleRecommended}>
-                    <Ionicons
-                      name={targetUser?.profile?.is_recommended ? 'ribbon' : 'ribbon-outline'}
-                      size={20}
-                      color={targetUser?.profile?.is_recommended ? '#f59f00' : '#555'}
-                    />
-                    <Text style={styles.actionText}>{targetUser?.profile?.is_recommended ? 'Quitar Recomendación' : 'Recomendar Perfil'}</Text>
-                  </TouchableOpacity>
+                  {/* Recomendar es solo de superadmin (el backend lo valida). */}
+                  {me?.is_superuser ? (
+                    <TouchableOpacity style={styles.actionOption} onPress={handlers.toggleRecommended}>
+                      <Ionicons
+                        name={targetUser?.profile?.is_recommended ? 'ribbon' : 'ribbon-outline'}
+                        size={20}
+                        color={targetUser?.profile?.is_recommended ? '#f59f00' : '#555'}
+                      />
+                      <Text style={styles.actionText}>{targetUser?.profile?.is_recommended ? 'Quitar Recomendación' : 'Recomendar Perfil'}</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                  {canManageRoles ? (
+                    <>
+                      {!targetRole.is_superuser ? (
+                        <TouchableOpacity
+                          style={styles.actionOption}
+                          onPress={() => changeAuthorRole('is_staff', !targetRole.is_staff)}
+                        >
+                          <Ionicons name="shield-outline" size={20} color="#845ef7" />
+                          <Text style={styles.actionText}>{targetRole.is_staff ? 'Quitar staff' : 'Hacer staff'}</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                      <TouchableOpacity
+                        style={styles.actionOption}
+                        onPress={() => changeAuthorRole('is_superuser', !targetRole.is_superuser)}
+                      >
+                        <Ionicons name="shield-checkmark-outline" size={20} color="#845ef7" />
+                        <Text style={styles.actionText}>{targetRole.is_superuser ? 'Quitar admin' : 'Hacer admin'}</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : null}
                   {canSuspendAuthor ? (
                     <TouchableOpacity
                       style={styles.actionOption}

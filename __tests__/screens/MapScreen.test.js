@@ -9,17 +9,25 @@ import { Linking, Text } from 'react-native';
 import TestRenderer, { act } from 'react-test-renderer';
 import * as Location from 'expo-location';
 import MapScreen from '../../screens/MapScreen';
-import WebMapScreen, { openStreetMapUrl } from '../../screens/MapScreen.web';
+import WebMapScreen from '../../screens/MapScreen.web';
 
 const mockAnimateToRegion = jest.fn();
 jest.mock('react-native-maps', () => {
   const { forwardRef, useImperativeHandle } = require('react');
-  const MockMapView = forwardRef((_props, ref) => {
+  const MockMapView = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({ animateToRegion: mockAnimateToRegion }));
-    return null;
+    return props.children ?? null;
   });
-  return { __esModule: true, default: MockMapView, PROVIDER_GOOGLE: 'google' };
+  const MockMarker = () => null;
+  return { __esModule: true, default: MockMapView, Marker: MockMarker, PROVIDER_GOOGLE: 'google' };
 });
+jest.mock('@react-navigation/native', () => ({ useFocusEffect: () => {} }));
+const mockMapTasks = { data: [] };
+jest.mock('@hooks/useApi', () => ({ useMapTasks: () => ({ ...mockMapTasks, refetch: jest.fn() }) }));
+const TASKS = [
+  { id: 't1', title: 'Consejo cerca', pch: 'consejos', latitude: 28.6, longitude: -106.1, user: { id: 'u1', username: 'ana' } },
+  { id: 't2', title: 'Petición', pch: 'peticiones', latitude: 28.7, longitude: -106.2, user: { id: 'u2', username: 'beto' } },
+];
 jest.mock('expo-location', () => ({
   Accuracy: { Balanced: 3 },
   requestForegroundPermissionsAsync: jest.fn(),
@@ -29,9 +37,10 @@ jest.mock('expo-location', () => ({
 
 const POSITION = { coords: { latitude: 28.5, longitude: -106.1 } };
 const textsOf = (renderer) => renderer.root.findAllByType(Text).map((node) => [].concat(node.props.children).join(''));
-const render = async (Screen = MapScreen) => {
+const navigation = { navigate: jest.fn() };
+const render = async (Screen = MapScreen, options) => {
   let renderer;
-  await act(async () => { renderer = TestRenderer.create(<Screen />); });
+  await act(async () => { renderer = TestRenderer.create(<Screen navigation={navigation} />, options); });
   return renderer;
 };
 const pressText = async (renderer, label) => {
@@ -47,6 +56,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   Location.getLastKnownPositionAsync.mockResolvedValue(null);
   Location.getCurrentPositionAsync.mockResolvedValue(POSITION);
+  mockMapTasks.data = [];
 });
 
 it('con permiso muestra el punto azul y se centra en la persona', async () => {
@@ -97,12 +107,49 @@ it('si no se puede leer la posición (GPS apagado) deja reintentar', async () =>
   act(() => renderer.unmount());
 });
 
-it('en la web usa OpenStreetMap, centrado en la persona cuando se conoce', async () => {
+it('pone un pin por aportación con ubicación y al tocarlo abre su tarjeta', async () => {
   grant();
-  const renderer = await render(WebMapScreen);
-  const src = renderer.root.findByType('iframe').props.src;
-  expect(src).toContain('openstreetmap.org/export/embed.html');
-  expect(src).toContain('marker=28.5,-106.1');
-  expect(openStreetMapUrl(null)).not.toContain('marker=');
+  mockMapTasks.data = TASKS;
+  const renderer = await render();
+  const pins = renderer.root.findAll((node) => node.props.coordinate && node.props.pinColor);
+  expect(pins.map((pin) => pin.props.coordinate)).toEqual([
+    { latitude: 28.6, longitude: -106.1 }, { latitude: 28.7, longitude: -106.2 },
+  ]);
+  expect(pins[0].props.pinColor).not.toBe(pins[1].props.pinColor);
+
+  await act(async () => { pins[1].props.onPress({ stopPropagation: jest.fn() }); });
+  expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Petición', 'peticiones · @beto']));
+  await pressText(renderer, 'Ver aportación');
+  expect(navigation.navigate).toHaveBeenCalledWith('Tasks', { screen: 'TaskDetail', params: { taskId: 't2' } });
   act(() => renderer.unmount());
+});
+
+it('en la web usa Leaflet: pines de las aportaciones y la persona al centro', async () => {
+  grant();
+  mockMapTasks.data = TASKS;
+  const handlers = [];
+  const layer = () => ({ addTo: jest.fn().mockReturnThis(), clearLayers: jest.fn() });
+  const map = { setView: jest.fn().mockReturnThis(), on: jest.fn(), remove: jest.fn() };
+  const markers = [];
+  window.L = {
+    map: jest.fn(() => map),
+    tileLayer: jest.fn(() => layer()),
+    layerGroup: jest.fn(() => layer()),
+    DomEvent: { stopPropagation: jest.fn() },
+    circleMarker: jest.fn((point, style) => {
+      const marker = { point, style, on: jest.fn((name, fn) => { handlers.push(fn); return marker; }), addTo: jest.fn() };
+      markers.push(marker);
+      return marker;
+    }),
+  };
+  const renderer = await render(WebMapScreen, { createNodeMock: () => ({}) });
+  await act(async () => {});
+  expect(markers.slice(0, 2).map((m) => m.point)).toEqual([[28.6, -106.1], [28.7, -106.2]]);
+  expect(map.setView).toHaveBeenLastCalledWith([28.5, -106.1], 13);
+
+  await act(async () => { handlers[0]({}); });
+  expect(textsOf(renderer)).toContain('Consejo cerca');
+  act(() => renderer.unmount());
+  expect(map.remove).toHaveBeenCalled();
+  delete window.L;
 });

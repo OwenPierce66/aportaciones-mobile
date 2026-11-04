@@ -83,6 +83,22 @@ export function useStories() {
 }
 
 /**
+ * Tareas compartidas desde una ubicación, para los pines del mapa. Va bajo ['tasks'] para
+ * que al publicar una nueva (que invalida ['tasks']) aparezca su pin.
+ */
+export function useMapTasks() {
+  return useQuery({
+    queryKey: ['tasks', 'map'],
+    queryFn: async () => {
+      const res = await api.get('tasks/map/');
+      return Array.isArray(res.data) ? res.data : [];
+    },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  });
+}
+
+/**
  * Lista simple de tareas (primera página) — para HomeScreen.
  */
 export function useTasks(params = {}) {

@@ -189,11 +189,18 @@ it('si el backend no encuentra la cuenta de la App lo explica', async () => {
   );
 });
 
-it('el staff que no es superadmin no ve la opción', async () => {
+it('el staff da like como la App y verifica, pero no cambia roles', async () => {
   const renderer = await renderFeed({ id: 'staff', is_superuser: false, is_staff: true });
   await openTaskActions(renderer);
-  expect(textsOf(renderer)).toContain('Verificar Perfil');
-  expect(textsOf(renderer)).not.toContain('Dar like como la App');
+  expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Verificar Perfil', 'Dar like como la App']));
+  expect(textsOf(renderer)).not.toEqual(expect.arrayContaining(['Hacer staff']));
+  expect(textsOf(renderer)).not.toEqual(expect.arrayContaining(['Hacer admin']));
+});
+
+it('un superadmin puede hacer staff o admin al autor', async () => {
+  const renderer = await renderFeed({ id: 'admin', is_superuser: true, is_staff: true });
+  await openTaskActions(renderer);
+  expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Hacer staff', 'Hacer admin']));
 });
 
 it('el autor de la aportación lleva sus insignias una sola vez', async () => {

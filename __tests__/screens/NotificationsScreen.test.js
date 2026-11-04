@@ -53,6 +53,32 @@ it('tocar la tarjeta de la historia que terminó la abre (y la marca como leída
   act(() => renderer.unmount());
 });
 
+it('el aviso de like de la App se marca y desmarca como visto', async () => {
+  const request = {
+    id: 'n2', notification_type: 'app_like_request', is_read: false, created_at: '2026-10-29T10:00:00Z',
+    target_type: 'task', target_id: 't1', actor: { id: 'ana', username: 'ana' }, data: { title: 'Aportación' },
+  };
+  const pressText = async (renderer, label) => {
+    const node = renderer.root.findAllByType(Text).find((n) => [].concat(n.props.children).join('') === label);
+    let button = node.parent;
+    while (!button.props.onPress) button = button.parent;
+    await act(async () => { button.props.onPress(); });
+  };
+
+  mockState.notifications = [request];
+  let renderer;
+  await act(async () => { renderer = TestRenderer.create(<NotificationsScreen navigation={{ navigate: jest.fn(), getState: () => ({ index: 0 }) }} />); });
+  await pressText(renderer, 'Marcar como visto');
+  expect(mockMarkRead).toHaveBeenLastCalledWith({ id: 'n2', seen: true });
+  act(() => renderer.unmount());
+
+  mockState.notifications = [{ ...request, is_read: true, data: { ...request.data, seen: true } }];
+  await act(async () => { renderer = TestRenderer.create(<NotificationsScreen navigation={{ navigate: jest.fn(), getState: () => ({ index: 0 }) }} />); });
+  await pressText(renderer, 'Marcar como no visto');
+  expect(mockMarkRead).toHaveBeenLastCalledWith({ id: 'n2', seen: false });
+  act(() => renderer.unmount());
+});
+
 it('si la historia ya no existe, la tarjeta no abre nada', async () => {
   mockState.notifications = [{ ...STORY, data: { ...STORY.data, story_exists: false } }];
   let renderer;

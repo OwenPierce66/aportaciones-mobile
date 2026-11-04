@@ -198,6 +198,8 @@ const ReelsScreen = ({ route }) => {
   const [selectedFollowedUsersOnly, setSelectedFollowedUsersOnly] = useState(false);
   const [selectedVerifiedUsersOnly, setSelectedVerifiedUsersOnly] = useState(false);
   const [selectedRecommendedUsersOnly, setSelectedRecommendedUsersOnly] = useState(false);
+  const [selectedAppLikedOnly, setSelectedAppLikedOnly] = useState(false);
+  const [selectedAdminUsersOnly, setSelectedAdminUsersOnly] = useState(false);
   const [selectedVideosOnly, setSelectedVideosOnly] = useState(true);
 
   useEffect(() => {
@@ -299,7 +301,9 @@ const ReelsScreen = ({ route }) => {
     followed_users_only: selectedFollowedUsersOnly,
     verified_users_only: selectedVerifiedUsersOnly,
     recommended_users_only: selectedRecommendedUsersOnly,
-  }), [tema, selectedCategory, selectedDateFilter, selectedSortBy, selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly, viewAs]);
+    app_liked_only: selectedAppLikedOnly,
+    admin_users_only: selectedAdminUsersOnly,
+  }), [tema, selectedCategory, selectedDateFilter, selectedSortBy, selectedFavoritesOnly, selectedFavoriteUsersOnly, selectedFollowedUsersOnly, selectedVerifiedUsersOnly, selectedRecommendedUsersOnly, selectedAppLikedOnly, selectedAdminUsersOnly, viewAs]);
 
   const reelsQuery = useReelsInfinite(reelsParams);
   const {
@@ -740,6 +744,8 @@ const ReelsScreen = ({ route }) => {
           currentFollowedUsers={selectedFollowedUsersOnly}
           currentVerifiedUsers={selectedVerifiedUsersOnly}
           currentRecommendedUsers={selectedRecommendedUsersOnly}
+          currentAppLiked={selectedAppLikedOnly}
+          currentAdminUsers={selectedAdminUsersOnly}
           currentVideosOnly={selectedVideosOnly}
           showVideoOnlyFilter
           isSuperAdmin={isAdmin}
@@ -752,6 +758,8 @@ const ReelsScreen = ({ route }) => {
             setSelectedFollowedUsersOnly(newFilters.followed_users_only ?? false);
             setSelectedVerifiedUsersOnly(newFilters.verified_users_only);
             setSelectedRecommendedUsersOnly(newFilters.recommended_users_only);
+            setSelectedAppLikedOnly(newFilters.app_liked_only ?? false);
+            setSelectedAdminUsersOnly(newFilters.admin_users_only ?? false);
             if (newFilters.videos_only !== selectedVideosOnly) {
               const previousVideosOnly = selectedVideosOnly;
               const nextVideosOnly = Boolean(newFilters.videos_only);

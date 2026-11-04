@@ -30,6 +30,12 @@ jest.mock('@hooks/useApi', () => ({
   useIsAdmin: () => mockAdmin,
 }));
 
+jest.mock('expo-location', () => ({
+  Accuracy: { Balanced: 3 },
+  requestForegroundPermissionsAsync: jest.fn(),
+  getCurrentPositionAsync: jest.fn(),
+}));
+
 const inputsBy = (renderer, placeholder) =>
   renderer.root.findAll((node) => node.type === TextInput && node.props.placeholder === placeholder);
 
@@ -268,5 +274,101 @@ describe('apoyo monetario al crear una petición', () => {
 
     expect(api.post).not.toHaveBeenCalled();
     expect(Alert.alert).toHaveBeenCalledWith('Revisa el apoyo', 'El mínimo es $10.00 MXN.');
+  });
+});
+
+describe('compartir desde mi ubicación', () => {
+  const Location = require('expo-location');
+
+  it('manda la ubicación al publicar y se puede quitar', async () => {
+    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
+    Location.getCurrentPositionAsync.mockResolvedValue({ coords: { latitude: 28.6356, longitude: -106.0889 } });
+    const renderer = await renderScreen();
+    await type(renderer, '¿Qué objetivo quieres compartir?', 'Aquí');
+
+    await pressText(renderer, 'Compartir desde mi ubicación');
+    expect(textsOf(renderer)).toContain('Aparecerá en el mapa en el lugar donde estás (aproximado, a unos 100 m).');
+    await pressText(renderer, 'PUBLICAR ÉXITO');
+    const formData = api.post.mock.calls[0][1];
+    expect(formValue(formData, 'latitude')).toBe('28.6356');
+    expect(formValue(formData, 'longitude')).toBe('-106.0889');
+  });
+
+  it('sin permiso avisa y no manda ubicación', async () => {
+    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'denied' });
+    const renderer = await renderScreen();
+    await type(renderer, '¿Qué objetivo quieres compartir?', 'Aquí');
+    await pressText(renderer, 'Compartir desde mi ubicación');
+    expect(Alert.alert).toHaveBeenCalledWith('Ubicación', expect.stringContaining('Permite el acceso'));
+
+    await pressText(renderer, 'PUBLICAR ÉXITO');
+    expect(formValue(api.post.mock.calls[0][1], 'latitude') ?? null).toBeNull();
+  });
+
+  it('al editar se puede quitar la ubicación', async () => {
+    const task = { id: 't1', title: 'Tarea', pch: 'consejos', categories: '', latitude: 28.6, longitude: -106.1, subtasks: [], subfactores: [], subfuentes: [] };
+    const renderer = await renderScreen({ task });
+    await pressText(renderer, 'Compartir desde mi ubicación');
+    await pressText(renderer, 'GUARDAR CAMBIOS');
+    const formData = api.patch.mock.calls[0][1];
+    expect(formValue(formData, 'latitude')).toBe('');
+    expect(formValue(formData, 'longitude')).toBe('');
+  });
+});
+
+describe('subtema dentro de subtema', () => {
+  const APP_TREE = [
+    { id: 1, name: 'Comida', parent: null },
+    { id: 2, name: 'Recetas', parent: 1 },
+  ];
+  const pressLast = async (renderer, label) => {
+    const targets = renderer.root.findAll((node) => (
+      node.props.onPress && node.findAll((child) => child.type === Text && child.props.children === label).length > 0
+    ));
+    await act(async () => { await targets[targets.length - 1].props.onPress(); });
+  };
+
+  afterEach(() => {
+    mockCategories.appCategories = { data: [] };
+    mockCategories.myCategories = { data: [] };
+  });
+
+  it('agrega un subtema a un subtema de la App en su lugar y lo ofrece después', async () => {
+    mockCategories.appCategories = { data: APP_TREE };
+    let nextId = 100;
+    api.post.mockImplementation(async (path, body) => (
+      path === 'categories/' ? { data: { id: nextId++, parent: null, ...body } } : { data: { id: 'nueva' } }
+    ));
+    const renderer = await renderScreen();
+    await pressText(renderer, 'Comida');
+    expect(textsOf(renderer)).toContain('Subtemas de Comida');
+    await pressText(renderer, 'Recetas');
+
+    await pressLast(renderer, 'Recetas');
+    await type(renderer, 'Subcategoría de Recetas...', 'Postres');
+    await act(async () => { await inputsBy(renderer, 'Subcategoría de Recetas...')[0].props.onSubmitEditing(); });
+
+    // Copia la ruta a tu filtro personal y cuelga la nueva debajo (no queda suelta).
+    const created = api.post.mock.calls.filter(([path]) => path === 'categories/').map(([, body]) => body);
+    expect(created).toEqual([
+      { name: 'Comida' },
+      { name: 'Recetas', parent: 100 },
+      { name: 'Postres', parent: 101 },
+    ]);
+    expect(textsOf(renderer)).toContain('Subtemas de Recetas');
+    expect(textsOf(renderer)).toContain('Postres');
+  });
+
+  it('muestra los subtemas de tus subtemas personales', async () => {
+    mockCategories.myCategories = { data: [
+      { id: 7, name: 'Viajes', parent: null },
+      { id: 8, name: 'Playas', parent: 7 },
+      { id: 9, name: 'Caribe', parent: 8 },
+    ] };
+    const renderer = await renderScreen();
+    await pressText(renderer, 'Viajes');
+    await pressText(renderer, 'Playas');
+    expect(textsOf(renderer)).toContain('Subtemas de Playas');
+    expect(textsOf(renderer)).toContain('Caribe');
   });
 });

@@ -177,7 +177,7 @@ const DraggableSubtheme = ({ name, index, subthemes, selected, onSelect, onReord
   );
 };
 
-const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus, currentDateFilter, currentSortBy, currentFavorites, currentFavoriteUsers, currentFollowedUsers, currentVerifiedUsers, currentRecommendedUsers, currentVideosOnly, showVideoOnlyFilter = false, isSuperAdmin, currentPch }) => {
+const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus, currentDateFilter, currentSortBy, currentFavorites, currentFavoriteUsers, currentFollowedUsers, currentVerifiedUsers, currentRecommendedUsers, currentAppLiked, currentAdminUsers, currentVideosOnly, showVideoOnlyFilter = false, isSuperAdmin, currentPch }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -191,6 +191,8 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
   const [followedUsersOnly, setFollowedUsersOnly] = useState(currentFollowedUsers || false);
   const [verifiedUsersOnly, setVerifiedUsersOnly] = useState(currentVerifiedUsers || false);
   const [recommendedUsersOnly, setRecommendedUsersOnly] = useState(currentRecommendedUsers || false);
+  const [appLikedOnly, setAppLikedOnly] = useState(currentAppLiked || false);
+  const [adminUsersOnly, setAdminUsersOnly] = useState(currentAdminUsers || false);
   const [videosOnly, setVideosOnly] = useState(currentVideosOnly || false);
   // ✅ USAMOS LA PROP DIRECTAMENTE, NO UN ESTADO LOCAL
   const isSuper = isSuperAdmin;
@@ -347,8 +349,10 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
     setFollowedUsersOnly(currentFollowedUsers || false);
     setVerifiedUsersOnly(currentVerifiedUsers || false);
     setRecommendedUsersOnly(currentRecommendedUsers || false);
+    setAppLikedOnly(currentAppLiked || false);
+    setAdminUsersOnly(currentAdminUsers || false);
     setVideosOnly(currentVideosOnly || false);
-  }, [currentCategory, currentStatus, currentDateFilter, currentSortBy, currentFavorites, currentFavoriteUsers, currentFollowedUsers, currentVerifiedUsers, currentRecommendedUsers, currentVideosOnly, visible, subthemesTree]);
+  }, [currentCategory, currentStatus, currentDateFilter, currentSortBy, currentFavorites, currentFavoriteUsers, currentFollowedUsers, currentVerifiedUsers, currentRecommendedUsers, currentAppLiked, currentAdminUsers, currentVideosOnly, visible, subthemesTree]);
 
   const fetchCategories = async () => {
     try {
@@ -562,6 +566,8 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
       followed_users_only: followedUsersOnly,
       verified_users_only: verifiedUsersOnly,
       recommended_users_only: recommendedUsersOnly,
+      app_liked_only: appLikedOnly,
+      admin_users_only: adminUsersOnly,
       videos_only: videosOnly,
     });
     onClose();
@@ -579,6 +585,8 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
     setFollowedUsersOnly(false);
     setVerifiedUsersOnly(false);
     setRecommendedUsersOnly(false);
+    setAppLikedOnly(false);
+    setAdminUsersOnly(false);
     setVideosOnly(showVideoOnlyFilter);
     onApply({
       category: '',
@@ -590,6 +598,8 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
       followed_users_only: false,
       verified_users_only: false,
       recommended_users_only: false,
+      app_liked_only: false,
+      admin_users_only: false,
       videos_only: showVideoOnlyFilter,
     });
     onClose();
@@ -889,6 +899,22 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
                   Usuarios Recomendados
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.optionBadge, appLikedOnly && styles.optionBadgeActive]}
+                onPress={() => setAppLikedOnly(!appLikedOnly)}
+              >
+                <Text style={[styles.optionText, appLikedOnly && styles.optionTextActive]}>
+                  Con like de la App
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.optionBadge, adminUsersOnly && styles.optionBadgeActive]}
+                onPress={() => setAdminUsersOnly(!adminUsersOnly)}
+              >
+                <Text style={[styles.optionText, adminUsersOnly && styles.optionTextActive]}>
+                  Usuarios Administradores
+                </Text>
+              </TouchableOpacity>
               {showVideoOnlyFilter && (
                 <TouchableOpacity
                   style={[styles.optionBadge, videosOnly && styles.optionBadgeActive]}
@@ -924,90 +950,6 @@ const FilterModal = ({ visible, onClose, onApply, currentCategory, currentStatus
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
-
-            <Text style={styles.sectionTitle}>Especiales</Text>
-            <View style={styles.optionsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.optionBadge,
-                  favoritesOnly && styles.optionBadgeActive,
-                ]}
-                onPress={() => setFavoritesOnly(!favoritesOnly)}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    favoritesOnly && styles.optionTextActive,
-                  ]}
-                >
-                  {favoritesOnly ? 'Solo mis favoritas' : 'Modo general (todas)'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.optionBadge,
-                  favoriteUsersOnly && styles.optionBadgeActive,
-                ]}
-                onPress={() => setFavoriteUsersOnly(!favoriteUsersOnly)}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    favoriteUsersOnly && styles.optionTextActive,
-                  ]}
-                >
-                  Mis Usuarios Favoritos
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.optionBadge,
-                  followedUsersOnly && styles.optionBadgeActive,
-                ]}
-                onPress={() => setFollowedUsersOnly(!followedUsersOnly)}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    followedUsersOnly && styles.optionTextActive,
-                  ]}
-                >
-                  Personas que sigo
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.optionBadge,
-                  verifiedUsersOnly && styles.optionBadgeActive,
-                ]}
-                onPress={() => setVerifiedUsersOnly(!verifiedUsersOnly)}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    verifiedUsersOnly && styles.optionTextActive,
-                  ]}
-                >
-                  Usuarios Verificados
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.optionBadge,
-                  recommendedUsersOnly && styles.optionBadgeActive,
-                ]}
-                onPress={() => setRecommendedUsersOnly(!recommendedUsersOnly)}
-              >
-                <Text
-                  style={[
-                    styles.optionText,
-                    recommendedUsersOnly && styles.optionTextActive,
-                  ]}
-                >
-                  Usuarios Recomendados
-                </Text>
-              </TouchableOpacity>
             </View>
 
             {isSuper ? (

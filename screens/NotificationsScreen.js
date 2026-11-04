@@ -64,6 +64,7 @@ const NOTIFICATION_COPY = {
   group_post_rejected:          { icon: 'close-circle',      color: '#e03131', text: 'rechazó tu publicación en el grupo' },
   petition_support:             { icon: 'cash',              color: '#2f9e44', text: 'apoyó monetariamente tu petición 💵' },
   petition_top_month:          { icon: 'trending-up',       color: '#f59f00', text: 'Una petición entró al top 5 mensual' },
+  app_like_request:             { icon: 'heart-circle',      color: '#000',    text: 'le dio like como la App. ¿Le das like tú también?' },
   forum_post_like:              { icon: 'heart',             color: '#ff5d73', text: 'le dio me gusta a tu publicación del foro' },
   forum_reply:                  { icon: 'arrow-undo',        color: '#4dabf7', text: 'respondió a tu comentario del foro' },
   forum_tag:                    { icon: 'pricetag',          color: '#845ef7', text: 'te etiquetó en el foro' },
@@ -208,6 +209,31 @@ const NotificationsScreen = ({ navigation }) => {
       });
     },
     onError: () => Alert.alert('Error', 'No se pudo eliminar la notificación.'),
+  });
+
+  // Aviso de "like de la App": marcarlo como visto hace que no vuelva a salir como nuevo.
+  const appLikeSeenMutation = useMutation({
+    mutationFn: ({ id, seen }) => api.post(`notifications/${id}/seen/`, { seen }),
+    onSuccess: ({ data: updated }, { id }) => {
+      let wasUnread = false;
+      queryClient.setQueryData(['notifications'], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => {
+            const results = Array.isArray(page) ? page : (page.results ?? []);
+            const next = results.map((n) => {
+              if (n.id !== id) return n;
+              wasUnread = !n.is_read;
+              return { ...n, ...updated };
+            });
+            return Array.isArray(page) ? next : { ...page, results: next };
+          }),
+        };
+      });
+      if (wasUnread && updated?.is_read) markOneReadLocally();
+    },
+    onError: () => Alert.alert('Error', 'No se pudo actualizar la notificación.'),
   });
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
@@ -478,6 +504,20 @@ const NotificationsScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             )
+          ) : null}
+          {type === 'app_like_request' ? (
+            <View style={styles.testimonialActions}>
+              <TouchableOpacity
+                style={styles.testimonialBtn}
+                onPress={() => appLikeSeenMutation.mutate({ id: item.id, seen: !item.data?.seen })}
+                disabled={appLikeSeenMutation.isPending}
+                accessibilityRole="button"
+              >
+                <Text style={styles.testimonialRejectText}>
+                  {item.data?.seen ? 'Marcar como no visto' : 'Marcar como visto'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           ) : null}
           <Text style={[styles.time, !item.is_read && styles.timeUnread]}>
             {moment(item.created_at).fromNow()}

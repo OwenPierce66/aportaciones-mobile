@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   View, Text, TextInput, ScrollView, TouchableOpacity, 
   StyleSheet, Alert, ActivityIndicator, Platform, Modal, FlatList 
@@ -17,6 +17,8 @@ import { CURRENCIES, amountError, formatMoney, subscriptionErrorMessage } from '
 import { openPetitionSupportCheckout } from '@hooks/usePetitionSupport';
 import SupportAmountFields from '@components/SupportAmountFields';
 import TaskSearchPicker from '@components/TaskSearchPicker';
+import { readCurrentLocation } from '../utils/currentLocation';
+import { categoryKey, childNamesOf, mergeCategoryTrees, pathOfName } from '../utils/categoryFilter';
 
 // ⚡ DICCIONARIO INTELIGENTE DE SUBTEMAS
 const PREDEFINED_SUBTEMAS = {
@@ -104,6 +106,13 @@ const CreateTaskScreen = ({ navigation, route }) => {
   const [loadingApprove, setLoadingApprove] = useState(false);
   // Modo oculto: solo tú la ves en tu perfil, como vista previa, hasta publicarla.
   const [isHidden, setIsHidden] = useState(false);
+  // "Compartir desde mi ubicación": { latitude, longitude } o null. La aportación sale en el mapa.
+  const [shareLocation, setShareLocation] = useState(
+    editTask?.latitude != null && editTask?.longitude != null
+      ? { latitude: editTask.latitude, longitude: editTask.longitude }
+      : null,
+  );
+  const [locating, setLocating] = useState(false);
   // "Siguiente recomendado": qué publicación recomiendas ver después (series, podcasts).
   const [nextTask, setNextTask] = useState(editTask?.next_task_info || null);
   // "Anterior recomendado": solo cuenta el que eligió el autor (no el que se deduce).
@@ -191,6 +200,12 @@ const CreateTaskScreen = ({ navigation, route }) => {
     if (adminData) setIsAdminUser(adminData.isAdmin);
   }, [adminData]);
 
+  // Las categorías de la App y las tuyas en un solo árbol (como el filtro), a cualquier nivel.
+  const categoryTree = useMemo(
+    () => mergeCategoryTrees(availableCategories, myCategories),
+    [availableCategories, myCategories],
+  );
+
   // Crea la categoría en tu filtro personal y la deja seleccionada al instante.
   const handleAddOwnCategory = async () => {
     const name = manualCategories.trim();
@@ -215,22 +230,28 @@ const CreateTaskScreen = ({ navigation, route }) => {
     }
   };
 
-  // Crea una subcategoría bajo la categoría elegida, a cualquier profundidad.
+  // Crea una subcategoría bajo la categoría elegida, a cualquier profundidad. Si la elegida
+  // es de la App (o un subtema de un subtema), primero copia su ruta completa a tu filtro
+  // personal, para que la nueva quede en su lugar (Tema › Subtema › Nueva) y no suelta.
   const handleAddOwnSubcategory = async () => {
     const name = manualSubcategories.trim();
     if (!name || !subParent) return;
-    const parentNode = myCategories.find(
-      c => c.name.trim().toLowerCase() === subParent.trim().toLowerCase()
-    );
+    const path = [...pathOfName(categoryTree, subParent, [...selectedCategories, ...selectedSubcategories]), name];
+    let mine = myCategories;
     try {
-      let parentId = parentNode?.id;
-      if (!parentId) {
-        const createdParent = await api.post('categories/', { name: subParent });
-        setMyCategories(prev => [...prev, createdParent.data]);
-        parentId = createdParent.data.id;
+      let parentId = null;
+      for (const levelName of path) {
+        let node = mine.find(c => (
+          categoryKey(c.name) === categoryKey(levelName) && String(c.parent ?? '') === String(parentId ?? '')
+        ));
+        if (!node) {
+          const response = await api.post('categories/', parentId == null ? { name: levelName } : { name: levelName, parent: parentId });
+          node = response.data;
+          mine = [...mine, node];
+        }
+        parentId = node.id;
       }
-      const response = await api.post('categories/', { name, parent: parentId });
-      setMyCategories(prev => [...prev, response.data]);
+      setMyCategories(mine);
       setSelectedSubcategories(prev => (prev.includes(name) ? prev : [...prev, name]));
       setManualSubcategories('');
     } catch (error) {
@@ -368,6 +389,19 @@ const CreateTaskScreen = ({ navigation, route }) => {
     );
   };
 
+  const handleToggleLocation = async () => {
+    if (shareLocation) {
+      setShareLocation(null);
+      return;
+    }
+    setLocating(true);
+    const { coords, error } = await readCurrentLocation();
+    setLocating(false);
+    if (coords) setShareLocation(coords);
+    else if (Platform.OS === 'web') window.alert(error);
+    else Alert.alert('Ubicación', error);
+  };
+
   const handleCreate = async () => {
     if (loading) return; 
 
@@ -411,6 +445,8 @@ const CreateTaskScreen = ({ navigation, route }) => {
         updateFormData.append('pch', tema);
         updateFormData.append('categories', finalCategories.join(','));
         updateFormData.append('is_hidden', isHidden ? 'true' : 'false');
+        updateFormData.append('latitude', shareLocation ? String(shareLocation.latitude) : '');
+        updateFormData.append('longitude', shareLocation ? String(shareLocation.longitude) : '');
         updateFormData.append('next_task', nextTask?.id ? String(nextTask.id) : '');
         updateFormData.append('previous_task', previousTask?.id ? String(previousTask.id) : '');
 
@@ -467,6 +503,10 @@ const CreateTaskScreen = ({ navigation, route }) => {
 
     formData.append('categories', finalCategories.join(','));
     formData.append('is_hidden', isHidden && !groupId && !testimonialFor ? 'true' : 'false');
+    if (shareLocation) {
+      formData.append('latitude', String(shareLocation.latitude));
+      formData.append('longitude', String(shareLocation.longitude));
+    }
     if (nextTask?.id) formData.append('next_task', String(nextTask.id));
     if (previousTask?.id) formData.append('previous_task', String(previousTask.id));
     if (groupId) formData.append('group', groupId);
@@ -862,23 +902,8 @@ Puedes apoyarla después desde el menú de 3 puntos.`,
             .filter((value, index, self) => self.indexOf(value) === index) // Evitar duplicados
             .map((theme, idx) => {
             const themeKey = theme.toLowerCase();
-            const catalogParent = availableCategories.find(
-              category => category.name.trim().toLowerCase() === themeKey && !category.parent
-            );
-            const personalParent = myCategories.find(
-              category => category.name.trim().toLowerCase() === themeKey && !category.parent
-            );
-            const catalogSubs = catalogParent
-              ? availableCategories
-                .filter(category => String(category.parent) === String(catalogParent.id))
-                .map(category => category.name)
-              : [];
-            const personalSubs = personalParent
-              ? myCategories
-                .filter(category => String(category.parent) === String(personalParent.id))
-                .map(category => category.name)
-              : [];
-            const subs = [...new Set([...(subthemesTree[themeKey] || []), ...catalogSubs, ...personalSubs])];
+            // Hijos en cualquier nivel: también los subtemas de un subtema.
+            const subs = [...new Set([...(subthemesTree[themeKey] || []), ...childNamesOf(categoryTree, theme)])];
             if (subs.length === 0) return null;
 
             return (
@@ -1020,6 +1045,33 @@ Puedes apoyarla después desde el menú de 3 puntos.`,
         </View>
       )}
 
+      {testimonialFor ? null : (
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>¿Desde dónde?</Text>
+        <TouchableOpacity
+          style={[styles.visibilityOption, styles.locationOption, shareLocation && styles.visibilityOptionActive]}
+          onPress={handleToggleLocation}
+          disabled={locating}
+          accessibilityRole="switch"
+          accessibilityState={{ checked: Boolean(shareLocation), busy: locating }}
+        >
+          {locating ? (
+            <ActivityIndicator size="small" color="#4dabf7" />
+          ) : (
+            <Ionicons name={shareLocation ? 'location' : 'location-outline'} size={18} color={shareLocation ? '#fff' : '#4dabf7'} />
+          )}
+          <Text style={[styles.visibilityText, shareLocation && styles.visibilityTextActive]}>
+            Compartir desde mi ubicación
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.visibilityHint}>
+          {shareLocation
+            ? 'Aparecerá en el mapa en el lugar donde estás (aproximado, a unos 100 m).'
+            : 'Si la activas, tu aportación aparecerá en el mapa en el lugar donde estás.'}
+        </Text>
+      </View>
+      )}
+
       {groupId || testimonialFor ? null : (
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>¿Cómo la quieres compartir?</Text>
@@ -1119,6 +1171,7 @@ const styles = StyleSheet.create({
   submitBtn: { backgroundColor: '#4dabf7', flexDirection: 'row', padding: 18, borderRadius: 15, alignItems: 'center', justifyContent: 'center', marginTop: 10, gap: 10, elevation: 3 },
   submitBtnDisabled: { backgroundColor: '#9bcbf5' },
   submitBtnText: { color: '#fff', fontWeight: '900', fontSize: 16, letterSpacing: 1 },
+  locationOption: { alignSelf: 'flex-start', marginBottom: 6 },
   visibilityRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   visibilityOption: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: '#d0ebff', backgroundColor: '#fff' },
   visibilityOptionActive: { backgroundColor: '#4dabf7', borderColor: '#4dabf7' },
