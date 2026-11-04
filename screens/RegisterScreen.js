@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import api, { saveAuthData } from '@api';
 import { AuthContext } from '@app';
+import GoogleSignInButton from '@components/GoogleSignInButton';
 import {
   validateEmail, validateUsername, validatePassword,
   validatePasswordConfirm, runValidations,
@@ -254,6 +255,8 @@ const RegisterScreen = ({ navigation }) => {
             : <Text style={styles.buttonText}>Registrarme</Text>
           }
         </TouchableOpacity>
+
+        <GoogleSignInButton onError={setServerError} />
 
         <View style={styles.loginLink}>
           <Text style={styles.linkText}>¿Ya tienes cuenta?{' '}</Text>

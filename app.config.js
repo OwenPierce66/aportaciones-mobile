@@ -17,6 +17,12 @@ const API_PORT  = process.env.API_PORT   || '8001';
 const API_URL   = process.env.API_URL   || process.env.EXPO_PUBLIC_API_URL || '';
 const SENTRY_DSN = process.env.SENTRY_DSN || '';
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || '';
+// Entrar con Google: IDs de cliente OAuth por plataforma (sin el de la plataforma no sale el botón).
+const GOOGLE_CLIENT_IDS = {
+  web:     process.env.GOOGLE_WEB_CLIENT_ID     || '',
+  android: process.env.GOOGLE_ANDROID_CLIENT_ID || '',
+  ios:     process.env.GOOGLE_IOS_CLIENT_ID     || '',
+};
 
 module.exports = {
   expo: {
@@ -37,7 +43,7 @@ module.exports = {
     web: {},
 
     plugins: [
-      // Pestaña Mapa: solo se pide mientras se usa la app.
+      // Mapa (menú lateral): solo se pide mientras se usa la app.
       [
         'expo-location',
         { locationWhenInUsePermission: 'Aportaciones usa tu ubicación para mostrarte en el mapa.' },
@@ -63,6 +69,8 @@ module.exports = {
       apiPort: API_PORT,
       /** DSN de Sentry para crash reporting (vacío = deshabilitado) */
       sentryDsn: SENTRY_DSN,
+      /** Entrar con Google: { web, android, ios } (vacío = sin el botón en esa plataforma) */
+      googleClientIds: GOOGLE_CLIENT_IDS,
     },
   },
 };
