@@ -11,6 +11,7 @@ import TouchableUsername from './TouchableUsername';
 import FollowHeart from './FollowHeart';
 import ContentActionsButton from './ContentActionsMenu';
 import LinkifiedText from './LinkifiedText';
+import SmartTextInput from './SmartTextInput';
 import AportacionCard from './AportacionCard';
 import FavoriteAportacionPicker from './FavoriteAportacionPicker';
 import UserTagPicker from './UserTagPicker';
@@ -244,8 +245,10 @@ const TopCommentPreview = ({ task, navigation, onOpenComments, onCountChange }) 
               onPickMedia={pickMedia}
               active={Boolean(aportacion || tags.length || media)}
             />
-            <TextInput
+            <SmartTextInput
               ref={inputRef}
+              containerStyle={styles.inputBox}
+              suggestionsAbove
               style={styles.input}
               // En la web un campo de varias líneas arranca con 2 renglones: se deja en uno, como los íconos.
               numberOfLines={Platform.OS === 'web' ? 1 : undefined}
@@ -320,6 +323,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8,
     borderWidth: 1, borderColor: '#e9ecef', borderRadius: 20, paddingHorizontal: 4, paddingVertical: 2,
   },
+  inputBox: { flex: 1 },
   // Del alto del clip (36); crece si escribes varias líneas.
   input: { flex: 1, minHeight: 36, maxHeight: 90, fontSize: 14, color: '#333', paddingVertical: 8 },
 });

@@ -1074,6 +1074,16 @@ const TasksScreen = ({ navigation, route }) => {
     setSearchSharedTasks([]);
   };
 
+  // Desde un #hashtag tocado en cualquier publicación: la búsqueda abierta con ese hashtag.
+  useEffect(() => {
+    const query = route?.params?.searchQuery;
+    if (!query) return;
+    openSearch();
+    setSearchText(query);
+    setSearchHasStarted(true);
+    navigation.setParams({ searchQuery: undefined });
+  }, [navigation, route?.params?.searchQuery]);
+
   useEffect(() => {
     if (searchExpanded) return undefined;
     const restoreScroll = () => {

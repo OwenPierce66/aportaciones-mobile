@@ -47,6 +47,9 @@ const NOTIFICATION_COPY = {
   task_shared_to_story:         { icon: 'time',              color: '#845ef7', text: 'compartió tu tarea en una historia' },
   task_tag:                     { icon: 'pricetag',          color: '#845ef7', text: 'te etiquetó en una publicación' },
   task_mention:                 { icon: 'at',                color: '#845ef7', text: 'te mencionó en un comentario' },
+  task_description_mention:     { icon: 'at',                color: '#845ef7', text: 'te mencionó en una publicación' },
+  shared_comment_mention:       { icon: 'at',                color: '#845ef7', text: 'te mencionó en un comentario de una publicación compartida' },
+  forum_mention:                { icon: 'at',                color: '#845ef7', text: 'te mencionó en el foro' },
   podcast_invite:               { icon: 'mic',               color: '#f783ac', text: '¡te eligió para grabar un podcast! 🎉' },
   podcast_approved:             { icon: 'ribbon',            color: '#f59f00', text: '¡El podcast donde fuiste etiquetado fue aprobado! ¡A grabar se ha dicho! 🎙️' },
   podcast_invitation_response:  { icon: 'chatbubbles',       color: '#4dabf7', text: 'respondió a la invitación del podcast' },
@@ -68,7 +71,7 @@ const NOTIFICATION_COPY = {
   forum_post_like:              { icon: 'heart',             color: '#ff5d73', text: 'le dio me gusta a tu publicación del foro' },
   forum_reply:                  { icon: 'arrow-undo',        color: '#4dabf7', text: 'respondió a tu comentario del foro' },
   forum_tag:                    { icon: 'pricetag',          color: '#845ef7', text: 'te etiquetó en el foro' },
-  shared_comment_tag:           { icon: 'pricetag',          color: '#845ef7', text: 'te etiquetó en un comentario' },
+  shared_comment_tag:           { icon: 'pricetag',          color: '#845ef7', text: 'te etiquetó en un comentario de una publicación compartida' },
   direct_message:               { icon: 'mail',              color: '#4dabf7', text: 'te envió un mensaje' },
   direct_message_reply:         { icon: 'return-up-back',    color: '#4dabf7', text: 'respondió a tu mensaje' },
   direct_message_like:          { icon: 'heart',             color: '#ff5d73', text: 'le dio me gusta a tu mensaje' },
@@ -86,6 +89,12 @@ const getActorName = (n) => {
 };
 
 const getNotificationType = (n) => n?.notification_type || n?.type || 'notification';
+
+// Menciones y etiquetas: además de dónde fue (el texto), en qué publicación y lo que se escribió.
+const MENTION_TYPES = new Set([
+  'task_description_mention', 'task_mention', 'shared_comment_mention', 'forum_mention',
+  'task_tag', 'comment_tag', 'shared_comment_tag', 'forum_tag',
+]);
 
 const getActionText = (n) => {
   const type = getNotificationType(n);
@@ -425,7 +434,12 @@ const NotificationsScreen = ({ navigation }) => {
     const actor = item.actor || {};
     const actorName = getActorName(item);
     const avatar = getImageUrl(actor.image || actor.user_image || actor.avatar || actor.profile_image);
-    const detail = item.data?.task_title || item.data?.title || item.data?.excerpt || item.data?.preview;
+    const isMention = MENTION_TYPES.has(type);
+    const placeTitle = item.data?.task_title || item.data?.title;
+    const detail = isMention
+      ? (placeTitle ? `En «${placeTitle}»` : null)
+      : item.data?.task_title || item.data?.title || item.data?.excerpt || item.data?.preview;
+    const quote = isMention && item.data?.excerpt ? `“${item.data.excerpt}”` : null;
 
     return (
       <TouchableOpacity
@@ -479,6 +493,7 @@ const NotificationsScreen = ({ navigation }) => {
           {detail ? (
             <Text style={styles.notificationDetail} numberOfLines={2}>{detail}</Text>
           ) : null}
+          {quote ? <Text style={styles.notificationQuote} numberOfLines={2}>{quote}</Text> : null}
           {(type === 'comment_tag' || type === 'profile_testimonial') && item.data?.testimonial_id ? (
             testimonialAnswers[item.data.testimonial_id] ? (
               <Text style={styles.testimonialDone}>
@@ -687,6 +702,7 @@ const styles = StyleSheet.create({
   notificationText: { fontSize: 14, lineHeight: 19, color: '#2d3436' },
   actorName: { fontWeight: '800' },
   notificationDetail: { fontSize: 13, lineHeight: 18, color: '#6c757d', marginTop: 3 },
+  notificationQuote: { fontSize: 13, lineHeight: 18, color: '#495057', fontStyle: 'italic', marginTop: 2 },
   time: { fontSize: 11, color: '#999', marginTop: 5 },
   testimonialActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   testimonialBtn: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12, backgroundColor: '#f1f3f5' },

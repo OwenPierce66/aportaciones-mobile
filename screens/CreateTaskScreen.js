@@ -17,6 +17,7 @@ import { CURRENCIES, amountError, formatMoney, subscriptionErrorMessage } from '
 import { openPetitionSupportCheckout } from '@hooks/usePetitionSupport';
 import SupportAmountFields from '@components/SupportAmountFields';
 import TaskSearchPicker from '@components/TaskSearchPicker';
+import SmartTextInput from '@components/SmartTextInput';
 import { readCurrentLocation } from '../utils/currentLocation';
 import { categoryKey, childNamesOf, mergeCategoryTrees, pathOfName } from '../utils/categoryFilter';
 
@@ -641,7 +642,7 @@ Puedes apoyarla después desde el menú de 3 puntos.`,
             )}
           </View>
           
-          <TextInput
+          <SmartTextInput
             style={styles.subInputDesc}
             placeholder="Descripción..."
             value={item.description}
@@ -682,7 +683,7 @@ Puedes apoyarla después desde el menú de 3 puntos.`,
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }} keyboardShouldPersistTaps="handled">
       <TouchableOpacity 
         style={styles.goBackBtn} 
         onPress={() => {
@@ -732,14 +733,17 @@ Puedes apoyarla después desde el menú de 3 puntos.`,
           placeholder={testimonialFor ? `¿Qué quieres decir de ${testimonialName}?` : '¿Qué objetivo quieres compartir?'} 
           placeholderTextColor="#999"
         />
-        <TextInput 
-          style={styles.mainDescInput} 
-          value={description} 
-          onChangeText={setDescription} 
-          placeholder={testimonialFor ? 'Escribe tu testimonio...' : 'Agrega una descripción general (opcional)...'} 
+        <SmartTextInput
+          style={styles.mainDescInput}
+          value={description}
+          onChangeText={setDescription}
+          placeholder={testimonialFor ? 'Escribe tu testimonio...' : 'Agrega una descripción general (opcional)...'}
           multiline
           placeholderTextColor="#aaa"
         />
+        <Text style={styles.smartHint}>
+          Usa @ para mencionar a alguien y # para hashtags. Los enlaces se abren al tocarlos.
+        </Text>
         
         {testimonialFor ? null : (
         <>
@@ -1172,6 +1176,7 @@ const styles = StyleSheet.create({
   submitBtnDisabled: { backgroundColor: '#9bcbf5' },
   submitBtnText: { color: '#fff', fontWeight: '900', fontSize: 16, letterSpacing: 1 },
   locationOption: { alignSelf: 'flex-start', marginBottom: 6 },
+  smartHint: { fontSize: 12, color: '#868e96', marginTop: 6 },
   visibilityRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   visibilityOption: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, borderWidth: 1, borderColor: '#d0ebff', backgroundColor: '#fff' },
   visibilityOptionActive: { backgroundColor: '#4dabf7', borderColor: '#4dabf7' },

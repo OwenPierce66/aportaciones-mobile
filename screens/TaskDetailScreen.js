@@ -24,6 +24,8 @@ import { CommentAttachMenu, CommentMediaChip, CommentAttachmentView } from '@com
 import FavoriteAportacionPicker from '@components/FavoriteAportacionPicker';
 import HiddenTaskBanner from '@components/HiddenTaskBanner';
 import UserTagPicker from '@components/UserTagPicker';
+import LinkifiedText from '@components/LinkifiedText';
+import SmartTextInput from '@components/SmartTextInput';
 import { useTaskDetail, useTaskComments, useMe, useIsAdmin } from '@hooks/useApi';
 import { buildCommentBody, getCommentAportacion } from '../utils/commentAportacion';
 import { pickPhotoOrVideo } from '../utils/mediaUpload';
@@ -139,7 +141,7 @@ const CommentItem = ({ comment, depth = 0, onReply, onLike, onLikeLongPress, onD
         />
       </View>
 
-      {comment.text || comment.content ? <Text style={styles.commentText}>{comment.text || comment.content}</Text> : null}
+      {comment.text || comment.content ? <LinkifiedText style={styles.commentText} text={comment.text || comment.content} /> : null}
       <CommentAttachmentView comment={comment} />
 
       {comment.tagged_users?.length ? (
@@ -963,7 +965,9 @@ const TaskDetailScreen = ({ route, navigation }) => {
           active={Boolean(attachedAportacion || commentTags.length || commentMedia)}
           mediaDisabled={Boolean(editingCommentId)}
         />
-        <TextInput
+        <SmartTextInput
+          containerStyle={styles.inputBox}
+          suggestionsAbove
           style={styles.input}
           // En la web un campo de varias líneas arranca con 2 renglones: se deja en uno, como los íconos.
           numberOfLines={Platform.OS === 'web' ? 1 : undefined}
@@ -1162,6 +1166,7 @@ const styles = StyleSheet.create({
   replyBannerText: { fontSize: 13, color: '#333' },
   commentInputContainer: { flexDirection: 'row', padding: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#eee', alignItems: 'flex-end', gap: 8 },
   // Del alto del clip y del botón de enviar (36); crece si escribes varias líneas.
+  inputBox: { flex: 1 },
   input: { flex: 1, backgroundColor: '#f5f5f5', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8, fontSize: 14, minHeight: 36, maxHeight: 100 },
   sendBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#4dabf7', justifyContent: 'center', alignItems: 'center' },
 

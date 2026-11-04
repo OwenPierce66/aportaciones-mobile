@@ -277,11 +277,26 @@ describe('ForumScreen', () => {
     mockUsePostsInfinite.mockReturnValue({ data: POSTS, isLoading: false });
     let renderer;
     await act(async () => { renderer = TestRenderer.create(<ForumScreen navigation={navigation} route={{ params: {} }} />); });
-    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', null);
+    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', null, '');
 
     await pressLabel(renderer, 'Categoría React');
-    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, 'React', null);
+    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, 'React', null, '');
     expect(textsOf(renderer)).toContain('React'); // resumen de la barra del filtro
+    act(() => renderer.unmount());
+  });
+
+  it('tocar un #hashtag de un post filtra el foro por él y se puede quitar', async () => {
+    mockUsePostsInfinite.mockReturnValue({ data: { pages: [{ results: [{
+      ...POSTS.pages[0].results[0], content: 'ayuda con #hooks',
+    }] }] }, isLoading: false });
+    let renderer;
+    await act(async () => { renderer = TestRenderer.create(<ForumScreen navigation={navigation} route={{ params: {} }} />); });
+    await pressLabel(renderer, 'Buscar #hooks');
+    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', null, 'hooks');
+    expect(textsOf(renderer)).toContain('#hooks');
+
+    await pressLabel(renderer, 'Quitar el filtro #hooks');
+    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', null, '');
     act(() => renderer.unmount());
   });
 
@@ -311,7 +326,7 @@ describe('ForumScreen', () => {
         <ForumScreen navigation={navigation} route={{ params: { groupId: 'g1', groupName: 'Huertos' } }} />,
       );
     });
-    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', 'g1');
+    expect(mockUsePostsInfinite).toHaveBeenLastCalledWith(null, '', 'g1', '');
     expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Foro de Huertos', 'Solo invitados']));
 
     await pressLabel(renderer, 'Crear post');

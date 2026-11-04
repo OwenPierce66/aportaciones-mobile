@@ -79,6 +79,22 @@ it('el aviso de like de la App se marca y desmarca como visto', async () => {
   act(() => renderer.unmount());
 });
 
+it('una mención dice dónde fue, en qué publicación y lo que se escribió', async () => {
+  mockState.notifications = [{
+    id: 'n3', notification_type: 'forum_mention', is_read: false, created_at: '2026-10-29T10:00:00Z',
+    target_type: 'forum_post', target_id: '5', actor: { id: 'ana', username: 'ana' },
+    text: 'ana te mencionó en una respuesta del foro.',
+    data: { text: 'ana te mencionó en una respuesta del foro.', title: 'Dudas', excerpt: 'Respondo @yo' },
+  }];
+  let renderer;
+  await act(async () => { renderer = TestRenderer.create(<NotificationsScreen navigation={{ navigate: jest.fn(), getState: () => ({ index: 0 }) }} />); });
+  const texts = renderer.root.findAllByType(Text).map((node) => [].concat(node.props.children).join(''));
+  expect(texts).toEqual(expect.arrayContaining([
+    'ana te mencionó en una respuesta del foro.', 'En «Dudas»', '“Respondo @yo”',
+  ]));
+  act(() => renderer.unmount());
+});
+
 it('si la historia ya no existe, la tarjeta no abre nada', async () => {
   mockState.notifications = [{ ...STORY, data: { ...STORY.data, story_exists: false } }];
   let renderer;

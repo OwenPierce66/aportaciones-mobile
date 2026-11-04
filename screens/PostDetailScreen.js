@@ -14,11 +14,13 @@ import { usePostDetail, useMe } from '@hooks/useApi';
 import { useMessageExtras, MessageExtrasView } from '@components/MessageExtras';
 import CategoryPicker from '@components/CategoryPicker';
 import CategoryChips from '@components/CategoryChips';
+import LinkifiedText from '@components/LinkifiedText';
+import SmartTextInput from '@components/SmartTextInput';
 
 moment.locale('es');
 
 // COMPONENTE RECURSIVO PARA RENDERIZAR REPLIES ANIDADAS
-const ReplyItem = ({ reply, depth = 0, onLike, onReply, onEdit, onDelete, currentUserId, replyingToId, getAuthorName, expandedReplyIds, toggleExpand, navigation }) => {
+const ReplyItem = ({ reply, depth = 0, onLike, onReply, onEdit, onDelete, currentUserId, replyingToId, getAuthorName, expandedReplyIds, toggleExpand, navigation, onHashtag }) => {
   const hasChildren = reply.replies && reply.replies.length > 0;
   const isExpanded = expandedReplyIds.includes(reply.id);
   const marginLeft = depth > 0 ? 12 : 0;
@@ -74,7 +76,7 @@ const ReplyItem = ({ reply, depth = 0, onLike, onReply, onEdit, onDelete, curren
           />
         </View>
 
-        {reply.content ? <Text style={styles.replyContent}>{reply.content}</Text> : null}
+        {reply.content ? <LinkifiedText style={styles.replyContent} text={reply.content} onHashtagPress={onHashtag} /> : null}
         <MessageExtrasView item={reply} navigation={navigation} compact />
 
         {currentUserId === reply.user?.id && (
@@ -120,6 +122,7 @@ const ReplyItem = ({ reply, depth = 0, onLike, onReply, onEdit, onDelete, curren
                 expandedReplyIds={expandedReplyIds}
                 toggleExpand={toggleExpand}
                 navigation={navigation}
+                onHashtag={onHashtag}
               />
             ))}
           </View>
@@ -272,6 +275,12 @@ const PostDetailScreen = () => {
     } catch (error) { Alert.alert('Error', 'No se pudo eliminar el contenido'); }
   };
 
+  // Un #hashtag del foro abre el foro (el del grupo, si el post es de uno) con ese hashtag.
+  const openForumHashtag = (hashtag) => {
+    const group = post?.group_info;
+    navigation.navigate('ForumMain', group ? { hashtag, groupId: group.id, groupName: group.name } : { hashtag });
+  };
+
   const editReply = (reply) => {
     setEditingReplyId(reply.id);
     setNewReply(reply.content || '');
@@ -368,13 +377,13 @@ const PostDetailScreen = () => {
           {editingPost ? (
             <>
               <TextInput style={styles.input} value={post.title} onChangeText={title => setPost(prev => ({ ...prev, title }))} />
-              <TextInput style={[styles.input, { minHeight: 90 }]} value={post.content} onChangeText={content => setPost(prev => ({ ...prev, content }))} multiline />
+              <SmartTextInput style={[styles.input, { minHeight: 90 }]} value={post.content} onChangeText={content => setPost(prev => ({ ...prev, content }))} multiline />
               <CategoryPicker value={post.categories || ''} onChange={categories => setPost(prev => ({ ...prev, categories }))} />
               <TouchableOpacity style={styles.sendBtn} onPress={savePost}><Ionicons name="checkmark" size={18} color="#fff" /></TouchableOpacity>
             </>
           ) : (
             <>
-              {post.content ? <Text style={styles.postContent}>{post.content}</Text> : null}
+              {post.content ? <LinkifiedText style={styles.postContent} text={post.content} onHashtagPress={openForumHashtag} /> : null}
               {/* Tocar una categoría abre el foro filtrado por ella. */}
               <CategoryChips categories={post.categories} onPress={category => navigation.navigate('ForumMain', { category })} />
               <MessageExtrasView item={post} navigation={navigation} />
@@ -403,6 +412,7 @@ const PostDetailScreen = () => {
                 expandedReplyIds={expandedReplyIds}
                 toggleExpand={toggleReplyExpansion}
                 navigation={navigation}
+                onHashtag={openForumHashtag}
               />
             ))
           )}
@@ -429,7 +439,9 @@ const PostDetailScreen = () => {
       {/* INPUT DE RESPUESTA */}
       <View style={styles.inputContainer}>
         {extras.clip}
-        <TextInput
+        <SmartTextInput
+          containerStyle={styles.inputBox}
+          suggestionsAbove
           style={styles.input}
           placeholder={replyingTo ? `Respondiendo a ${getPostAuthorName(replyingTo)}...` : 'Escribe una respuesta...'}
           value={newReply}
@@ -503,6 +515,7 @@ const styles = StyleSheet.create({
   replyingBannerText: { fontSize: 13, color: '#333' },
   inputContainer: { flexDirection: 'row', padding: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#eee', gap: 8, alignItems: 'flex-end' },
   // Del alto del clip (36); crece si escribes varias líneas.
+  inputBox: { flex: 1 },
   input: { flex: 1, borderWidth: 1, borderColor: '#e0e0e0', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8, fontSize: 14, color: '#333', minHeight: 36, maxHeight: 100 },
   sendBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#4dabf7', justifyContent: 'center', alignItems: 'center' } });
 

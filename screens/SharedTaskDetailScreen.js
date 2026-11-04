@@ -26,6 +26,8 @@ import ShareActionMenu from './ShareActionMenu';
 import ReportContentButton from '@components/ReportContentButton';
 import { useSharedTaskDetail, useMe, useIsAdmin } from '@hooks/useApi';
 import { useMessageExtras, MessageExtrasView } from '@components/MessageExtras';
+import LinkifiedText from '@components/LinkifiedText';
+import SmartTextInput from '@components/SmartTextInput';
 import { optimisticRepost, repostFromResponse, repostSnapshot } from '../utils/repost';
 
 moment.locale('es');
@@ -130,7 +132,7 @@ const SharedCommentItem = ({
       </View>
 
       {/* TEXTO DEL COMENTARIO */}
-      {comment.text ? <Text style={styles.commentText}>{comment.text}</Text> : null}
+      {comment.text ? <LinkifiedText style={styles.commentText} text={comment.text} /> : null}
       <MessageExtrasView item={comment} navigation={navigation} compact />
 
       {/* ACCIONES */}
@@ -698,7 +700,9 @@ const SharedTaskDetailScreen = ({ route, navigation }) => {
       {/* INPUT DE COMENTARIO */}
       <View style={styles.commentInputContainer}>
         {extras.clip}
-        <TextInput
+        <SmartTextInput
+          containerStyle={styles.inputBox}
+          suggestionsAbove
           style={styles.input}
           numberOfLines={Platform.OS === 'web' ? 1 : undefined}
           placeholder={replyingTo ? 'Escribe tu respuesta...' : 'Escribe un comentario...'}
@@ -844,6 +848,7 @@ const styles = StyleSheet.create({
   replyBannerText: { fontSize: 13, color: '#333' },
   commentInputContainer: { flexDirection: 'row', padding: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#eee', alignItems: 'flex-end', gap: 8 },
   // Del alto del clip y del botón de enviar (36); crece si escribes varias líneas.
+  inputBox: { flex: 1 },
   input: { flex: 1, backgroundColor: '#f5f5f5', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8, fontSize: 14, minHeight: 36, maxHeight: 100 },
   sendBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#4dabf7', justifyContent: 'center', alignItems: 'center' },
 

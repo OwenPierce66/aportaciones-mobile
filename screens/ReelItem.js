@@ -7,6 +7,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { getImageUrl } from '../api';
 import ProgressControls from './ProgressControls';
 import ExpandableText from '../components/ExpandableText';
+import { RichText } from '../components/LinkifiedText';
 import TouchableUsername from '../components/TouchableUsername';
 import FollowHeart from '../components/FollowHeart';
 import { useMyRelations } from '../hooks/useMyRelations';
@@ -308,9 +309,12 @@ const ReelItemComponent = ({
                       onToggle={() => toggleDescription(item.id)}
                       toggleStyle={styles.seeMore}
                       renderText={(lines) => (
-                        <Text style={styles.description} numberOfLines={lines}>
-                          {entry?.groupIndex != null && entry?.item?.description ? `${contentItem.description} • ${entry.item.description}` : contentItem.description}
-                        </Text>
+                        <RichText
+                          style={styles.description}
+                          linkStyle={styles.descriptionLink}
+                          numberOfLines={lines}
+                          text={entry?.groupIndex != null && entry?.item?.description ? `${contentItem.description} • ${entry.item.description}` : contentItem.description}
+                        />
                       )}
                     />
                   </>
@@ -320,7 +324,9 @@ const ReelItemComponent = ({
                     expanded={!!expandedDescriptions[item.id]}
                     onToggle={() => toggleDescription(item.id)}
                     toggleStyle={styles.seeMore}
-                    renderText={(lines) => <Text style={styles.description} numberOfLines={lines}>{entry?.item?.description}</Text>}
+                    renderText={(lines) => (
+                      <RichText style={styles.description} linkStyle={styles.descriptionLink} numberOfLines={lines} text={entry?.item?.description} />
+                    )}
                   />
                 )}
               </View>
@@ -465,6 +471,8 @@ const styles = StyleSheet.create({
   username: { color: '#fff', fontSize: 16, fontWeight: 'bold', textShadow: '1px 1px 4px rgba(0, 0, 0, 0.75)' },
   title: { color: '#fff', fontSize: 15, fontWeight: '600', marginBottom: 6, textShadow: '1px 1px 4px rgba(0, 0, 0, 0.75)' },
   description: { color: '#fff', fontSize: 14, textShadow: '1px 1px 4px rgba(0, 0, 0, 0.75)' },
+  // Enlaces, menciones y hashtags sobre el video: claros para que se lean.
+  descriptionLink: { color: '#a5d8ff' },
   seeMore: { color: '#fff', opacity: 0.85, marginBottom: 12, textShadow: '1px 1px 4px rgba(0, 0, 0, 0.75)' },
   categoriesScroll: { flexDirection: 'row', marginBottom: 5 },
   categoryBadge: { backgroundColor: 'rgba(0,0,0,0.4)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginRight: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },

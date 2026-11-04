@@ -20,6 +20,8 @@ import CategoryFilterBar from '@components/CategoryFilterBar';
 import CategoryPicker from '@components/CategoryPicker';
 import CategoryChips from '@components/CategoryChips';
 import ForumAudiencePicker, { audienceOf } from '@components/ForumAudiencePicker';
+import { RichText } from '@components/LinkifiedText';
+import SmartTextInput from '@components/SmartTextInput';
 
 moment.locale('es');
 
@@ -43,6 +45,11 @@ const ForumScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (route?.params?.category !== undefined) setCategory(route.params.category || '');
   }, [route?.params?.category]);
+  // Un #hashtag tocado en el foro: solo los posts que lo usan (en el post o en sus respuestas).
+  const [hashtag, setHashtag] = useState(route?.params?.hashtag || '');
+  useEffect(() => {
+    if (route?.params?.hashtag !== undefined) setHashtag(route.params.hashtag || '');
+  }, [route?.params?.hashtag]);
 
   // ─── React Query ────────────────────────────────────────────────────────────
   const {
@@ -53,7 +60,7 @@ const ForumScreen = ({ navigation, route }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = usePostsInfinite(filterUserId, category, groupId);
+  } = usePostsInfinite(filterUserId, category, groupId, hashtag);
   const posts = useMemo(() => flattenPosts(data), [data]);
   const isOnline = useIsOnline();
   const { data: me } = useMe();
@@ -198,7 +205,7 @@ const ForumScreen = ({ navigation, route }) => {
             : {})}
         />
       </View>
-      {item.content ? <Text style={styles.postContent} numberOfLines={2}>{item.content}</Text> : null}
+      {item.content ? <RichText style={styles.postContent} numberOfLines={2} text={item.content} onHashtagPress={setHashtag} /> : null}
       <CategoryChips categories={item.categories} onPress={setCategory} />
       <MessageExtrasView item={item} navigation={navigation} compact />
       {currentUserId === item.user?.id && (
@@ -261,6 +268,14 @@ const ForumScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
       <CategoryFilterBar value={category} onChange={setCategory} showStatuses={false} style={styles.filterBar} />
+      {hashtag ? (
+        <View style={styles.hashtagBar}>
+          <Text style={styles.hashtagText}>#{hashtag}</Text>
+          <TouchableOpacity onPress={() => setHashtag('')} accessibilityLabel={`Quitar el filtro #${hashtag}`} hitSlop={8}>
+            <Ionicons name="close-circle" size={18} color="#868e96" />
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       <FlatList
         data={posts}
@@ -281,7 +296,7 @@ const ForumScreen = ({ navigation, route }) => {
               <View style={{ alignItems: 'center', marginTop: 50 }}>
                 <Ionicons name="chatbox-outline" size={60} color="#ccc" />
                 <Text style={{ marginTop: 16, color: '#999' }}>
-                  {category ? 'No hay posts en esta categoría' : 'No hay posts aún'}
+                  {hashtag ? `No hay posts con #${hashtag}` : category ? 'No hay posts en esta categoría' : 'No hay posts aún'}
                 </Text>
               </View>
             ) : (
@@ -314,7 +329,7 @@ const ForumScreen = ({ navigation, route }) => {
               onChangeText={setNewPostTitle}
               placeholderTextColor="#999"
             />
-            <TextInput
+            <SmartTextInput
               style={[styles.input, { height: 120, textAlignVertical: 'top' }]}
               placeholder="Contenido del post"
               value={newPostContent}
@@ -362,6 +377,8 @@ const ForumScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+  hashtagBar: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 6, marginHorizontal: 16, marginBottom: 8, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: '#e7f5ff' },
+  hashtagText: { color: '#1c7ed6', fontWeight: '700', fontSize: 14 },
   container:    { flex: 1, backgroundColor: '#FEF6F5' },
   header:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, paddingTop: Platform.OS === 'android' ? 34 : 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
   headerTitle:  { fontSize: 24, fontWeight: '800', color: '#333' },

@@ -536,12 +536,14 @@ export function useFavoritesTop(userId, { enabled = true } = {}) {
  * El backend devuelve 10 por página (StandardPagination); antes solo se leía
  * la primera, por lo que los posts más antiguos nunca eran visibles.
  */
-export function usePostsInfinite(userId = null, category = '', groupId = null) {
+export function usePostsInfinite(userId = null, category = '', groupId = null, hashtag = '') {
   // Foro de un usuario, de un grupo y/o de una categoría ("Tema,Subtema"), como el filtro de las tareas.
+  // `hashtag`: solo los posts que usan ese #hashtag (sin el #).
   const filters = {};
   if (userId) filters.user = userId;
   if (groupId) filters.group = groupId;
   if (category) filters.category = category;
+  if (hashtag) filters.hashtag = hashtag;
   return useInfiniteQuery({
     queryKey: Object.keys(filters).length ? ['posts', filters] : ['posts'],
     queryFn: async ({ pageParam = 1 }) => {

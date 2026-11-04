@@ -221,6 +221,19 @@ const ForumStackNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ForumMain" component={ForumScreen} />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+      {/* Desde el foro se abren perfiles (una @mención, un autor) y publicaciones adjuntas. */}
+      <Stack.Screen name="UserProfile" component={ProfileScreen} />
+      <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
+      <Stack.Screen name="SharedTaskDetail" component={SharedTaskDetailScreen} />
+      <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+      <Stack.Screen name="CreateTask" component={CreateTaskScreen} />
+      <Stack.Screen name="FollowList" component={FollowListScreen} />
+      <Stack.Screen name="Favorites" component={FavoritesScreen} />
+      <Stack.Screen name="Subscriptions" component={SubscriptionsScreen} />
+      <Stack.Screen name="PetitionSupports" component={PetitionSupportsScreen} />
+      <Stack.Screen name="Groups" component={GroupsScreen} />
+      <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
+      <Stack.Screen name="GroupForm" component={GroupFormScreen} />
     </Stack.Navigator>
   );
 };
