@@ -15,6 +15,7 @@ import FollowHeart from '@components/FollowHeart';
 import PetitionSupportStat from '@components/PetitionSupportStat';
 import TopCommentPreview from '@components/TopCommentPreview';
 import StoryRing from '@components/StoryRing';
+import FullImageModal from '@components/FullImageModal';
 import { withLegacyLink } from '../utils/links';
 import { subItemTitle } from '../utils/aportaciones';
 import {
@@ -66,15 +67,28 @@ const feedMediaStyle = (ratio, width) => (
 );
 
 // ─── Foto del feed con su propia forma (no un recorte fijo) ──────────────────
+// Si es muy alta o muy ancha se recorta un poco: al tocarla se ve completa.
 export const FeedImage = ({ uri, width }) => {
   const [ratio, onSize] = useMediaRatio(uri);
+  const [fullVisible, setFullVisible] = useState(false);
   return (
-    <Image
-      source={{ uri }}
-      style={[styles.subImage, feedMediaStyle(ratio, width)]}
-      contentFit="cover"
-      onLoad={(event) => onSize(imageSizeFromLoad(event))}
-    />
+    <>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={[styles.subImage, feedMediaStyle(ratio, width)]}
+        onPress={() => setFullVisible(true)}
+        accessibilityRole="imagebutton"
+        accessibilityLabel="Ver foto completa"
+      >
+        <Image
+          source={{ uri }}
+          style={styles.subImageFill}
+          contentFit="cover"
+          onLoad={(event) => onSize(imageSizeFromLoad(event))}
+        />
+      </TouchableOpacity>
+      {fullVisible ? <FullImageModal uri={uri} onClose={() => setFullVisible(false)} /> : null}
+    </>
   );
 };
 
@@ -628,7 +642,8 @@ const styles = StyleSheet.create({
   // El tamaño lo da la forma de cada foto o video (feedMediaStyle).
   subMediaWrapper: { alignSelf: 'center', marginTop: 12, borderRadius: 14, overflow: 'hidden', backgroundColor: '#000' },
   subMedia: { width: '100%', height: '100%', backgroundColor: '#000' },
-  subImage: { alignSelf: 'center', marginTop: 12, borderRadius: 14, backgroundColor: '#f1f3f5' },
+  subImage: { alignSelf: 'center', marginTop: 12, borderRadius: 14, overflow: 'hidden', backgroundColor: '#f1f3f5' },
+  subImageFill: { width: '100%', height: '100%' },
   videoTouchSurface: { ...StyleSheet.absoluteFillObject },
   videoControls: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 58, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, backgroundColor: 'rgba(0,0,0,0.62)' },
   videoControlButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },

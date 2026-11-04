@@ -1,8 +1,8 @@
 /**
  * __tests__/components/feedMedia.test.js
  *
- * Fotos y videos con su propia forma: en el feed (sin el recorte fijo de antes) y en
- * reels (llenan la pantalla o se ven completos).
+ * Fotos y videos con su propia forma: en el feed (sin el recorte fijo de antes; al tocar
+ * una foto se ve completa) y en reels (llenan la pantalla o se ven completos).
  */
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -27,12 +27,25 @@ const sizeOf = (node) => {
 let renderer;
 afterEach(() => act(() => renderer?.unmount()));
 
+const pressable = (label) => renderer.root.findAll((node) => node.props.accessibilityLabel === label && node.props.onPress)[0];
+
 it('la foto del feed toma su forma al cargar (vertical: 4:5)', async () => {
   await act(async () => { renderer = TestRenderer.create(<FeedImage uri="http://x/vertical.jpg" width={340} />); });
-  const image = () => renderer.root.findByType(Image);
-  expect(sizeOf(image())).toEqual({ width: 340, height: 340 });
-  await act(async () => { image().props.onLoad({ source: { width: 1080, height: 1920 } }); });
-  expect(sizeOf(image())).toEqual({ width: 340, height: 425 });
+  const photo = () => pressable('Ver foto completa');
+  expect(sizeOf(photo())).toEqual({ width: 340, height: 340 });
+  await act(async () => { renderer.root.findByType(Image).props.onLoad({ source: { width: 1080, height: 1920 } }); });
+  expect(sizeOf(photo())).toEqual({ width: 340, height: 425 });
+});
+
+it('al tocar la foto del feed se ve completa, y se cierra', async () => {
+  await act(async () => { renderer = TestRenderer.create(<FeedImage uri="http://x/muy-alta.jpg" width={340} />); });
+  await act(async () => { pressable('Ver foto completa').props.onPress(); });
+  const full = renderer.root.findAllByType(Image).filter((image) => image.props.contentFit === 'contain');
+  expect(full).toHaveLength(1);
+  expect(full[0].props.source).toEqual({ uri: 'http://x/muy-alta.jpg' });
+
+  await act(async () => { pressable('Cerrar').props.onPress(); });
+  expect(renderer.root.findAllByType(Image)).toHaveLength(1);
 });
 
 it('el video del feed toma su forma y va sobre negro', async () => {
