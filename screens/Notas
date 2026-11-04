@@ -50,7 +50,7 @@ que si eres el admin que te aparezca la opcion para poder cambiarla de en proces
 -anclar guardados y anclar favoritos en perfiles o cualquier lugar y tener la opcion de ocultarlos o no *
 -acomodar todos los botones basicos en el inicio o tareas*
 -botones en taskdetail como impulsar compartir y guardar(la publicacion debe ser casi identica a la que se renderiza en taskscreen)*
--input de decripcion mas inteligente tipo que puedas poner cualquier link, etiquetar, hashtags, vermas... etc,
+-input de decripcion mas inteligente tipo que puedas poner cualquier link, etiquetar, hashtags, vermas... etc,*
 -regresarle el traductor a los mensajes directos(primordial)*
 -agregarle el filtro a los foros*
 -descargar*
@@ -58,7 +58,7 @@ que si eres el admin que te aparezca la opcion para poder cambiarla de en proces
 y notificar al usuario cuando se haya decidido hacer el podcast
 (esta ya se hizo pero se debe expandir no solo a eso si no tambien a todo en general y con eso me refiero ah que tambien puedas notificar si su peticion fue aprobada y notificar a los admins cuando una peticion esta en las toop 5 o ah llegado al top de las aportaciones con mas likes en ese mes )*
 -etiquetar en comentarios*
--poderle agregar subtema al subtema en createtask y en buscar(en buscar ya se hizo pero createtask debe de estar muy bien en sincroinia con los filtros de las categorias y subcategorias al igual que todo)
+-poderle agregar subtema al subtema en createtask y en buscar(en buscar ya se hizo pero createtask debe de estar muy bien en sincroinia con los filtros de las categorias y subcategorias al igual que todo)*
 -arreglar el boton de regresar de notificaciones y de todos los  lugares(el boton de regresar debe ser inteligenet en cualquier pantalla en la que este, se debe de regresar a la que estaba no importa desde donde ah sido llamado el nuevo componente sin daña el estado anterior del componente en el que estaba, se supone que asi debe de funcionar un boton de regresar)*
 -que al crear una tarea con categoria de grabar podcast que automaticamente tenga el subtema en procesando y que no aparezca el aprovado, amenos *
 -categoria de Aprobadas que solo lo pueda poner los admin*
@@ -102,11 +102,11 @@ cosas por hacer:
 -historial de comentarios(no es primordial)
 -como admin puedes borrar tareas
 -ajustar bien el video e imagen al reel y taskscreen
--ubicacion
+-ubicacion*
 --regresar la funcion de ver la descripcion de quien ah compartido esa tarea en reels ya sea tus favoritos o global-
 -y la funcion de anclar todo tambien, en tus perfiles favoritos, tareas favoritas y que el usuario pueda elegir entre ponerlo en modo oculto al publico o no
 -El Modo "Ver como Usuario Seleccionado" (Infiltrarse en el Feed de Otro Perfil)
--like de la app o compania
+-like de la app o compania*
 -Segmentación Temporal del Feed (top_day, top_week, top_month)
 En peticiones.js: El sistema de ordenamiento permitía clasificar las peticiones no solo por fecha o popularidad general, sino por ventanas de tiempo específicas:
 top_day: Lo más votado en las últimas 24 horas.

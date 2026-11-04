@@ -1,9 +1,9 @@
 /**
  * components/SmartTextInput.js
  *
- * TextInput para escribir descripciones: al escribir @ sugiere personas y al escribir #
- * los hashtags que ya se usan (los más usados primero); tocar una sugerencia completa la
- * palabra. Al mostrarse (LinkifiedText) los enlaces, menciones y hashtags se pueden tocar,
+ * TextInput para escribir descripciones: al escribir @ sugiere personas (con su nombre, para
+ * distinguir usuarios parecidos) y al escribir # los hashtags que ya se usan (los más usados
+ * primero); tocar una sugerencia completa la palabra. Al mostrarse (LinkifiedText) los enlaces, menciones y hashtags se pueden tocar,
  * y a quien mencionas le llega un aviso cuando se publica.
  *
  * `containerStyle`: el estilo de la caja que envuelve el campo (p. ej. { flex: 1 } en una barra).
@@ -27,7 +27,12 @@ async function fetchSuggestions({ sigil, query }) {
     return (Array.isArray(data?.profiles) ? data.profiles : [])
       .filter((profile) => profile.username)
       .slice(0, MAX_SUGGESTIONS)
-      .map((profile) => ({ key: `@${profile.id}`, name: profile.username, label: `@${profile.username}` }));
+      .map((profile) => ({
+        key: `@${profile.id}`,
+        name: profile.username,
+        label: `@${profile.username}`,
+        subtitle: [profile.first_name, profile.last_name].filter(Boolean).join(' '),
+      }));
   }
   const { data } = await api.get('hashtags/', { params: { q: query } });
   return (Array.isArray(data) ? data : [])
@@ -124,7 +129,10 @@ const SmartTextInput = forwardRef(({
               onPress={() => pick(item)}
               accessibilityRole="button"
             >
-              <Text style={styles.label} numberOfLines={1}>{item.label}</Text>
+              <View style={styles.texts}>
+                <Text style={styles.label} numberOfLines={1}>{item.label}</Text>
+                {item.subtitle ? <Text style={styles.subtitle} numberOfLines={1}>{item.subtitle}</Text> : null}
+              </View>
               {item.detail ? <Text style={styles.detail}>{item.detail}</Text> : null}
             </TouchableOpacity>
           ))}
@@ -170,7 +178,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f1f3f5',
   },
-  label: { flex: 1, fontSize: 14, fontWeight: '600', color: '#1c7ed6' },
+  texts: { flex: 1 },
+  label: { fontSize: 14, fontWeight: '600', color: '#1c7ed6' },
+  subtitle: { marginTop: 1, fontSize: 12, color: '#868e96' },
   detail: { fontSize: 12, color: '#868e96' },
 });
 

@@ -44,15 +44,21 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-it('al escribir @ sugiere personas y completa la mención', async () => {
-  api.get.mockResolvedValue({ data: { profiles: [{ id: 1, username: 'ana.lu' }, { id: 2, username: 'andres' }] } });
+it('al escribir @ sugiere personas con su nombre y completa la mención', async () => {
+  api.get.mockResolvedValue({ data: { profiles: [
+    { id: 1, username: 'ana.lu', first_name: 'Ana', last_name: 'Luna' },
+    { id: 2, username: 'andres' },
+    { id: 3, username: null, first_name: 'Sin usuario' },
+  ] } });
   let renderer;
   await act(async () => { renderer = TestRenderer.create(<Host />); });
   await act(async () => { inputOf(renderer).props.onFocus(); });
 
   await typeAt(renderer, 'Gracias @an');
   expect(api.get).toHaveBeenLastCalledWith('search/directory/', { params: { q: 'an', scope: 'profiles' } });
-  expect(labels(renderer)).toEqual(expect.arrayContaining(['@ana.lu', '@andres']));
+  expect(labels(renderer)).toEqual(expect.arrayContaining(['@ana.lu', 'Ana Luna', '@andres']));
+  // A quien no tiene usuario no se le puede mencionar.
+  expect(labels(renderer)).not.toContain('Sin usuario');
 
   await pressLabel(renderer, '@ana.lu');
   expect(lastValue).toBe('Gracias @ana.lu ');

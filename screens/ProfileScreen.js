@@ -25,6 +25,7 @@ import CategoryHierarchy from '@components/CategoryHierarchy';
 import ProfileSubscription from '@components/ProfileSubscription';
 import PetitionSupportStat from '@components/PetitionSupportStat';
 import HiddenTaskBanner from '@components/HiddenTaskBanner';
+import UsernameNotice from '@components/UsernameNotice';
 import TestimonialCard from '@components/TestimonialCard';
 import { NameWithBadges } from '@components/UserBadges';
 import LanguagePickerModal from '@components/LanguagePickerModal';
@@ -749,6 +750,10 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
         <RecommendButton userId={socialUserId} isCurrentUser={isCurrentUser} />
       </View>
+
+      {isCurrentUser ? (
+        <UsernameNotice user={user} onPress={() => navigation.navigate('EditProfile', { user })} />
+      ) : null}
 
       <SocialLinks links={socialStats?.social_links} style={styles.socialLinks} />
 
