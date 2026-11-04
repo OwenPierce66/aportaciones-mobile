@@ -23,7 +23,7 @@ afterEach(() => { jest.useRealTimers(); });
 
 it('al abrir muestra sugerencias sin escribir y al escribir busca', async () => {
   api.get
-    .mockResolvedValueOnce({ data: { profiles: [{ id: 'u1', username: 'seguido' }, { id: 'me', username: 'yo' }] } })
+    .mockResolvedValueOnce({ data: { profiles: [{ id: 'u1', username: 'seguido', email: 'seguido@gmail.com' }, { id: 'me', username: 'yo' }] } })
     .mockResolvedValueOnce({ data: { profiles: [{ id: 'u2', username: 'ana' }] } });
   const onChange = jest.fn();
   let renderer;
@@ -32,7 +32,7 @@ it('al abrir muestra sugerencias sin escribir y al escribir busca', async () => 
   });
   await act(async () => { jest.runOnlyPendingTimers(); });
   expect(api.get).toHaveBeenCalledWith('search/directory/', { params: { q: '', scope: 'profiles' } });
-  expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Sugerencias', '@seguido']));
+  expect(textsOf(renderer)).toEqual(expect.arrayContaining(['Sugerencias', '@seguido', 'seguido@gmail.com']));
   expect(textsOf(renderer)).not.toContain('@yo');
 
   const row = renderer.root.findAll((node) => node.props.accessibilityLabel === 'Etiquetar @seguido' && node.props.onPress)[0];

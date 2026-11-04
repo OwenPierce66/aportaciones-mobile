@@ -115,9 +115,13 @@ const UserTagPicker = ({ visible, onClose, selected = [], onChange, excludeIds =
                     accessibilityRole="button"
                     accessibilityLabel={`${isSelected ? 'Quitar etiqueta' : 'Etiquetar'} @${item.username}`}
                   >
-                    <NameWithBadges userId={item.id} style={styles.name} containerStyle={styles.nameRow}>
-                      @{item.username}
-                    </NameWithBadges>
+                    {/* El correo al lado, para distinguir cuentas con usuarios parecidos. */}
+                    <View style={styles.person}>
+                      <NameWithBadges userId={item.id} style={styles.name} containerStyle={styles.nameRow}>
+                        @{item.username}
+                      </NameWithBadges>
+                      {item.email ? <Text style={styles.email} numberOfLines={1}>{item.email}</Text> : null}
+                    </View>
                     <Ionicons
                       name={isSelected ? 'checkmark-circle' : 'ellipse-outline'}
                       size={24}
@@ -158,8 +162,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: '#f1f3f5',
   },
   rowDisabled: { opacity: 0.4 },
-  nameRow: { flex: 1 },
+  person: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  nameRow: { flexShrink: 1 },
   name: { fontSize: 15, fontWeight: '600', color: '#343a40' },
+  email: { flexShrink: 1, fontSize: 12, color: '#868e96' },
 });
 
 export default UserTagPicker;

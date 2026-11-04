@@ -1670,6 +1670,7 @@ const TasksScreen = ({ navigation, route }) => {
                   <Text style={styles.directoryResultText} numberOfLines={1}>
                     {profile.username || [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Perfil'}
                   </Text>
+                  {profile.email ? <Text style={styles.directoryResultEmail} numberOfLines={1}>{profile.email}</Text> : null}
                 </TouchableOpacity>
               ))}
             </View>
@@ -2109,6 +2110,7 @@ const styles = StyleSheet.create({
   directoryResults: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   directoryResult: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 12, backgroundColor: '#f8f9fa' },
   directoryResultText: { maxWidth: 140, color: '#343a40', fontSize: 12 },
+  directoryResultEmail: { maxWidth: 170, color: '#868e96', fontSize: 11 },
   searchInput: { 
     flex: 1, 
     height: 45, 

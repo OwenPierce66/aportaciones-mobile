@@ -1,9 +1,9 @@
 /**
  * components/SmartTextInput.js
  *
- * TextInput para escribir descripciones: al escribir @ sugiere personas (con su nombre, para
- * distinguir usuarios parecidos) y al escribir # los hashtags que ya se usan (los más usados
- * primero); tocar una sugerencia completa la palabra. Al mostrarse (LinkifiedText) los enlaces, menciones y hashtags se pueden tocar,
+ * TextInput para escribir descripciones: al escribir @ sugiere personas (con su correo al lado
+ * y su nombre debajo, para distinguir cuentas parecidas) y al escribir # los hashtags que ya se
+ * usan (los más usados primero); tocar una sugerencia completa la palabra. Al mostrarse (LinkifiedText) los enlaces, menciones y hashtags se pueden tocar,
  * y a quien mencionas le llega un aviso cuando se publica.
  *
  * `containerStyle`: el estilo de la caja que envuelve el campo (p. ej. { flex: 1 } en una barra).
@@ -31,6 +31,7 @@ async function fetchSuggestions({ sigil, query }) {
         key: `@${profile.id}`,
         name: profile.username,
         label: `@${profile.username}`,
+        email: profile.email || '',
         subtitle: [profile.first_name, profile.last_name].filter(Boolean).join(' '),
       }));
   }
@@ -130,7 +131,10 @@ const SmartTextInput = forwardRef(({
               accessibilityRole="button"
             >
               <View style={styles.texts}>
-                <Text style={styles.label} numberOfLines={1}>{item.label}</Text>
+                <View style={styles.handleRow}>
+                  <Text style={styles.label} numberOfLines={1}>{item.label}</Text>
+                  {item.email ? <Text style={styles.email} numberOfLines={1}>{item.email}</Text> : null}
+                </View>
                 {item.subtitle ? <Text style={styles.subtitle} numberOfLines={1}>{item.subtitle}</Text> : null}
               </View>
               {item.detail ? <Text style={styles.detail}>{item.detail}</Text> : null}
@@ -179,7 +183,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f1f3f5',
   },
   texts: { flex: 1 },
-  label: { fontSize: 14, fontWeight: '600', color: '#1c7ed6' },
+  handleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  label: { flexShrink: 1, fontSize: 14, fontWeight: '600', color: '#1c7ed6' },
+  email: { flexShrink: 1, fontSize: 12, color: '#868e96' },
   subtitle: { marginTop: 1, fontSize: 12, color: '#868e96' },
   detail: { fontSize: 12, color: '#868e96' },
 });
