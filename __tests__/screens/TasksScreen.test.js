@@ -160,6 +160,13 @@ it('el ícono de categorías abre Explorar categorías', async () => {
   expect(navigation.navigate).toHaveBeenCalledWith('CategoryExplorer', { pch: 'consejos', path: '' });
 });
 
+it('el menú lateral está en Tareas y no en Aportaciones', async () => {
+  const menuButtons = (renderer) => renderer.root.findAll((node) => node.props.accessibilityLabel === 'Abrir menú lateral' && node.props.onPress);
+  expect(menuButtons(await renderFeed({ id: 'yo' }))).toHaveLength(0);
+  act(() => mounted.unmount());
+  expect(menuButtons(await renderFeed({ id: 'yo' }, { route: { name: 'HomeMain' } }))).not.toHaveLength(0);
+});
+
 it('un superadmin da y quita el like de la App', async () => {
   api.post.mockResolvedValueOnce({ data: { task_id: 't1', liked: true, likes_count: 4, app_account_id: 'owen' } });
   const renderer = await renderFeed({ id: 'admin', is_superuser: true, is_staff: true });

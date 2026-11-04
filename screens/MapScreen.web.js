@@ -1,7 +1,7 @@
 /**
  * screens/MapScreen.web.js
  *
- * Pestaña Mapa en el navegador: react-native-maps no funciona en la web, así que se usa
+ * El Mapa en el navegador: react-native-maps no funciona en la web, así que se usa
  * Leaflet con OpenStreetMap (se carga del CDN al abrir el mapa). Muestra a la persona (punto
  * azul), se centra en ella cuando se conoce su ubicación y pone un pin por cada aportación
  * compartida desde una ubicación; al tocarlo sale su tarjeta.

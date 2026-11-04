@@ -1,10 +1,10 @@
 /**
  * screens/MapScreen.js
  *
- * Pestaña Mapa: Google Maps con el punto azul, el botón "mi ubicación" y un pin por cada
- * aportación compartida desde una ubicación (al tocarlo sale su tarjeta). Al abrirla pide
- * el permiso y se centra en la persona. La versión web está en MapScreen.web.js, porque
- * react-native-maps no funciona en el navegador.
+ * Mapa (se abre desde el menú lateral): Google Maps con el punto azul, el botón "mi
+ * ubicación" y un pin por cada aportación compartida desde una ubicación (al tocarlo sale
+ * su tarjeta). Al abrirlo pide el permiso y se centra en la persona. La versión web está en
+ * MapScreen.web.js, porque react-native-maps no funciona en el navegador.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -27,7 +27,7 @@ const MapScreen = ({ navigation }) => {
   const { data: tasks = [], refetch } = useMapTasks();
   const [selected, setSelected] = useState(null);
 
-  // Al volver a la pestaña (p. ej. después de publicar) se recargan los pines.
+  // Al volver al mapa (p. ej. después de publicar) se recargan los pines.
   useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
 
   useEffect(() => {

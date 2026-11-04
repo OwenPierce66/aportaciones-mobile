@@ -324,8 +324,13 @@ const AuthenticatedTabs = () => {
       <Tab.Screen name="Reels" component={ReelsScreen} options={{ tabBarLabel: 'Reels' }} />
       <Tab.Screen name="Messages" component={MessagesStackNavigator} options={{ tabBarLabel: 'Mensajes' }} />
       <Tab.Screen name="Notifications" component={NotificationsStackNavigator} options={{ tabBarLabel: 'Notificaciones' }} />
-      <Tab.Screen name="Map" component={MapScreen} options={{ tabBarLabel: 'Mapa' }} />
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
+      {/* Sin botón en la barra de abajo: se abren desde el menú lateral. */}
+      <Tab.Screen
+        name="Map"
+        component={MapScreen}
+        options={{ tabBarButton: () => null }}
+      />
       <Tab.Screen
         name="Stories"
         component={Stories24hScreen}

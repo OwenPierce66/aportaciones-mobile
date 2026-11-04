@@ -15,6 +15,7 @@ import SavedFiltersModal from '@components/SavedFiltersModal';
 import { Video } from 'expo-av';
 import ShareModal from '@components/ShareModal';
 import { AuthContext } from '@app';
+import SideMenu from '@components/SideMenu';
 import ShareActionMenu from './ShareActionMenu';
 import TouchableUsername from '@components/TouchableUsername';
 import FollowHeart from '@components/FollowHeart';
@@ -1677,6 +1678,14 @@ const TasksScreen = ({ navigation, route }) => {
       ) : (
         <View style={styles.header}>
           <View style={styles.headerIdentity}>
+            {isTasksTab ? (
+              <SideMenu
+                navigation={navigation}
+                signOut={signOut}
+                user={user}
+                buttonStyle={styles.headerMenuButton}
+              />
+            ) : null}
             <Text style={styles.headerTitle}>
               {isTasksTab ? 'Tareas' : 'Aportaciones'}
             </Text>

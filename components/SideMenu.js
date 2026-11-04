@@ -77,6 +77,7 @@ const SideMenu = ({ navigation, signOut, user, buttonStyle }) => {
                 ['videocam-outline', 'Reels', () => navigate('Reels')],
                 ['chatbubbles-outline', 'Mensajes directos', () => navigate('Messages')],
                 ['notifications-outline', 'Notificaciones', () => navigate('Notifications')],
+                ['map-outline', 'Mapa', () => navigate('Map')],
                 ['person-outline', 'Perfil', () => navigate('Profile')],
                 ['time-outline', 'Historias', () => navigate('Stories')],
                 ['share-outline', 'Compartidas', () => navigate('SharedTasks')],
