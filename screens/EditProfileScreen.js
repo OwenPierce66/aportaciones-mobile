@@ -78,8 +78,9 @@ const EditProfileScreen = ({ navigation, route }) => {
       console.error('--- ERROR ACTUALIZANDO PERFIL ---');
       console.error('Respuesta del servidor:', JSON.stringify(error.response?.data, null, 2));
       console.error('Configuración de la petición:', JSON.stringify(error.config, null, 2));
-      const socialError = error.response?.data?.social_links;
-      Alert.alert('Error', socialError ? String(socialError) : 'No se pudo actualizar el perfil.');
+      const data = error.response?.data;
+      const fieldError = data?.username || data?.social_links;
+      Alert.alert('Error', fieldError ? String(fieldError) : 'No se pudo actualizar el perfil.');
     } finally {
       setLoading(false);
     }
