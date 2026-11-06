@@ -1,8 +1,9 @@
 /**
  * screens/DeleteAccountScreen.js
  *
- * Eliminar la cuenta para siempre: explica qué se pierde y pide la contraseña y escribir
- * ELIMINAR, para que no ocurra por un toque accidental.
+ * Eliminar la cuenta para siempre: explica qué se pierde y pide escribir ELIMINAR, para que no
+ * ocurra por un toque accidental, y confirmar que eres tú con la contraseña o con Google. Las
+ * cuentas creadas con Google no tienen contraseña: solo confirman con Google.
  */
 import React, { useContext, useState } from 'react';
 import {
@@ -12,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import api from '@api';
 import { AuthContext } from '@app';
+import GoogleButton, { hasGoogleClientId } from '@components/GoogleButton';
 
 const CONFIRM_WORD = 'ELIMINAR';
 // Borrar una cuenta con mucho contenido, con el servidor recién despertado, puede tardar.
@@ -25,32 +27,41 @@ const CONSEQUENCES = [
 ];
 
 const DeleteAccountScreen = ({ navigation }) => {
-  const { signOut } = useContext(AuthContext);
+  const { signOut, user } = useContext(AuthContext);
+  const hasPassword = user?.has_password !== false;
   const [password, setPassword] = useState('');
   const [confirmWord, setConfirmWord] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [serverError, setServerError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // Con qué se está confirmando: 'password' o 'google'.
+  const [deletingWith, setDeletingWith] = useState(null);
+  const isLoading = Boolean(deletingWith);
 
-  const ready = Boolean(password) && confirmWord.trim().toUpperCase() === CONFIRM_WORD;
+  const confirmed = confirmWord.trim().toUpperCase() === CONFIRM_WORD;
+  const ready = Boolean(password) && confirmed;
 
-  const handleDelete = async () => {
-    if (!ready || isLoading) return;
-    setIsLoading(true);
+  const deleteAccount = async (proof, via) => {
+    if (!confirmed || isLoading) return;
+    setDeletingWith(via);
     setPasswordError('');
     setServerError('');
     try {
-      await api.post('users/me/delete/', { password }, { timeout: SLOW_SERVER_TIMEOUT_MS });
+      await api.post('users/me/delete/', proof, { timeout: SLOW_SERVER_TIMEOUT_MS });
       await signOut({ accountDeleted: true });
     } catch (error) {
       const data = error.response?.data;
       if (data?.password) {
         setPasswordError(data.password[0]);
       } else {
-        setServerError(data?.detail ? String(data.detail) : 'No se pudo eliminar tu cuenta. Revisa tu conexión e intenta de nuevo.');
+        const detail = data?.id_token?.[0] || data?.detail;
+        setServerError(detail ? String(detail) : 'No se pudo eliminar tu cuenta. Revisa tu conexión e intenta de nuevo.');
       }
-      setIsLoading(false);
+      setDeletingWith(null);
     }
+  };
+
+  const handleDelete = () => {
+    if (ready) deleteAccount({ password }, 'password');
   };
 
   return (
@@ -75,15 +86,19 @@ const DeleteAccountScreen = ({ navigation }) => {
           </View>
         ))}
 
-        <Text style={styles.label}>Tu contraseña</Text>
-        <TextInput
-          style={[styles.input, passwordError && styles.inputError]}
-          placeholder="Contraseña"
-          secureTextEntry
-          value={password}
-          onChangeText={(value) => { setPassword(value); setPasswordError(''); }}
-        />
-        {passwordError ? <Text style={styles.fieldError}>{passwordError}</Text> : null}
+        {hasPassword ? (
+          <>
+            <Text style={styles.label}>Tu contraseña</Text>
+            <TextInput
+              style={[styles.input, passwordError && styles.inputError]}
+              placeholder="Contraseña"
+              secureTextEntry
+              value={password}
+              onChangeText={(value) => { setPassword(value); setPasswordError(''); }}
+            />
+            {passwordError ? <Text style={styles.fieldError}>{passwordError}</Text> : null}
+          </>
+        ) : null}
 
         <Text style={styles.label}>Escribe {CONFIRM_WORD} para confirmar</Text>
         <TextInput
@@ -96,15 +111,34 @@ const DeleteAccountScreen = ({ navigation }) => {
         />
         {serverError ? <Text style={styles.serverError}>{serverError}</Text> : null}
 
-        <TouchableOpacity
-          style={[styles.button, (!ready || isLoading) && styles.buttonDisabled]}
-          onPress={handleDelete}
-          disabled={!ready || isLoading}
-          activeOpacity={0.8}
-          accessibilityLabel="Eliminar mi cuenta para siempre"
-        >
-          {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Eliminar mi cuenta para siempre</Text>}
-        </TouchableOpacity>
+        {hasPassword ? (
+          <TouchableOpacity
+            style={[styles.button, (!ready || isLoading) && styles.buttonDisabled]}
+            onPress={handleDelete}
+            disabled={!ready || isLoading}
+            activeOpacity={0.8}
+            accessibilityLabel="Eliminar mi cuenta para siempre"
+          >
+            {deletingWith === 'password'
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.buttonText}>Eliminar mi cuenta para siempre</Text>}
+          </TouchableOpacity>
+        ) : null}
+        {hasPassword && hasGoogleClientId() ? <Text style={styles.or}>o</Text> : null}
+        <GoogleButton
+          label="Confirmar con Google y eliminar"
+          busy={deletingWith === 'google'}
+          disabled={!confirmed || isLoading}
+          onIdToken={(idToken) => deleteAccount({ id_token: idToken }, 'google')}
+          onError={setServerError}
+        />
+        {!hasPassword && !hasGoogleClientId() ? (
+          <Text style={styles.note}>
+            Tu cuenta entra con Google y esta versión de la app no puede confirmarlo. Ponle una contraseña con
+            «¿Olvidaste tu contraseña?» al iniciar sesión y vuelve aquí.
+          </Text>
+        ) : null}
+
         <TouchableOpacity style={styles.cancel} onPress={() => navigation.goBack()} disabled={isLoading}>
           <Text style={styles.cancelText}>Conservar mi cuenta</Text>
         </TouchableOpacity>
@@ -133,6 +167,8 @@ const styles = StyleSheet.create({
   button: { backgroundColor: '#e03131', borderRadius: 10, height: 50, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   buttonDisabled: { opacity: 0.45 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  or: { textAlign: 'center', color: '#888', fontSize: 13, marginTop: 14 },
+  note: { fontSize: 14, color: '#495057', marginTop: 16, lineHeight: 20 },
   cancel: { alignItems: 'center', marginTop: 18 },
   cancelText: { color: '#4dabf7', fontSize: 14, fontWeight: '600' },
 });
