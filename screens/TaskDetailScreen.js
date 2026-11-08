@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Alert, TextInput, Platform, KeyboardAvoidingView, Dimensions, useWindowDimensions
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment'; 
@@ -1067,7 +1068,7 @@ const TaskDetailScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, paddingTop: Platform.OS === 'android' ? 34 : 16, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#eee' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, paddingTop: topBarPadding(16), backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#eee' },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   podcastAcceptButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#51cf66', borderRadius: 16, paddingHorizontal: 10, paddingVertical: 6, marginLeft: 'auto', marginRight: 8 },
   podcastAcceptText: { color: '#fff', fontSize: 12, fontWeight: '800', marginLeft: 4 },

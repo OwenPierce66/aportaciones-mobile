@@ -10,6 +10,7 @@ import {
   Alert,
   useWindowDimensions,
   Platform } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import moment from 'moment'; 
 import api, { getImageUrl, UPLOAD_TIMEOUT_MS } from '@api';
@@ -775,7 +776,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    paddingTop: Platform.OS === 'android' ? 34 : 16,
+    paddingTop: topBarPadding(16),
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderColor: '#eee' },

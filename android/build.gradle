@@ -48,3 +48,27 @@ subprojects { subproject ->
         }
     }
 }
+
+// expo-constants mete app.config.js en el APK (de ahí salen los IDs de Google), pero su tarea no
+// lee el .env ni declara de qué depende: Gradle reusaba una copia vieja. Se rehace siempre, con el
+// .env (las variables que ya estén en la terminal mandan, como en Expo).
+def dotEnvVars = [:]
+def dotEnvFile = file("../.env")
+if (dotEnvFile.exists()) {
+    dotEnvFile.eachLine { line ->
+        line = line.trim()
+        if (line && !line.startsWith("#") && line.contains("=")) {
+            def key = line.substring(0, line.indexOf("=")).trim()
+            def value = line.substring(line.indexOf("=") + 1).trim().replaceAll(/^["']|["']$/, "")
+            if (!System.getenv().containsKey(key)) dotEnvVars[key] = value
+        }
+    }
+}
+subprojects { subproject ->
+    if (subproject.name == 'expo-constants') {
+        subproject.tasks.matching { it.name ==~ /create.*ExpoConfig/ }.configureEach { task ->
+            task.environment(dotEnvVars)
+            task.outputs.upToDateWhen { false }
+        }
+    }
+}

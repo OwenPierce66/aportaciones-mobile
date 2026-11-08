@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import {
   ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View,
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import moment from 'moment';
@@ -149,7 +150,7 @@ const ProfileVisitsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingTop: Platform.OS === 'android' ? 34 : 14, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#f1f3f5' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingTop: topBarPadding(14), paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#f1f3f5' },
   back: { padding: 4 },
   title: { fontSize: 20, fontWeight: '800', color: '#212529' },
   content: { padding: 16, paddingBottom: 40 },

@@ -4,6 +4,7 @@ import {
   RefreshControl, TextInput, Platform, ActivityIndicator, Modal, Alert, Button, SafeAreaView, useWindowDimensions,
   InteractionManager, AppState, Animated, PanResponder
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import moment from 'moment';
@@ -2078,7 +2079,7 @@ const styles = StyleSheet.create({
   collapsingHeader: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20 },
   fixedTitle: { zIndex: 2, backgroundColor: '#fff' },
   movingHeader: { zIndex: 1, backgroundColor: '#FEF6F5' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 34, paddingBottom: 8, backgroundColor: '#fff' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: topBarPadding(34), paddingBottom: 8, backgroundColor: '#fff' },
   headerIdentity: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerMenuButton: { padding: 2 },
   headerTitle: { fontSize: 24, fontWeight: '800', color: '#333' },
@@ -2094,7 +2095,7 @@ const styles = StyleSheet.create({
   visibilityValue: { color: '#868e96', fontSize: 12, fontWeight: '600' },
   visibilityClose: { alignSelf: 'flex-end', marginTop: 14, paddingHorizontal: 12, paddingVertical: 8 },
   visibilityCloseText: { color: '#1864ab', fontWeight: '700' },
-  searchHeader: { paddingHorizontal: 12, paddingTop: 34, paddingBottom: 12, backgroundColor: '#fff', gap: 8 },
+  searchHeader: { paddingHorizontal: 12, paddingTop: topBarPadding(34), paddingBottom: 12, backgroundColor: '#fff', gap: 8 },
   searchHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   searchInputHost: { flex: 1, minWidth: 0 },
   searchLoading: { position: 'absolute', right: 42, top: 26 },

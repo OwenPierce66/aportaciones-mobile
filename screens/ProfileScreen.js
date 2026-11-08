@@ -4,6 +4,7 @@ import {
   ActivityIndicator, RefreshControl, Platform, Modal, Alert,
   ScrollView, useWindowDimensions,
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import { Image } from 'expo-image';
@@ -1576,13 +1577,13 @@ const WRITE_TESTIMONIAL_ITEM = { id: '__write_testimonial__', isWriteAction: tru
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FEF6F5' },
-  topBar: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', paddingTop: Platform.OS === 'ios' ? 50 : 34 },
-  backBtn: { position: 'absolute', left: 16, top: Platform.OS === 'ios' ? 50 : 34, zIndex: 10 },
+  topBar: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', paddingTop: topBarPadding(Platform.OS === 'ios' ? 50 : 34) },
+  backBtn: { position: 'absolute', left: 16, top: topBarPadding(Platform.OS === 'ios' ? 50 : 34), zIndex: 10 },
   topBarTitle: { fontSize: 20, fontWeight: '800', color: '#333' },
-  profileMenuButton: { position: 'absolute', right: 16, top: Platform.OS === 'ios' ? 50 : 34, padding: 4 },
-  profileHeartButton: { position: 'absolute', right: 52, top: Platform.OS === 'ios' ? 50 : 34, padding: 4 },
-  sideMenuButton: { position: 'absolute', left: 16, top: Platform.OS === 'ios' ? 50 : 34, zIndex: 10 },
-  profileMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-start', alignItems: 'flex-end', paddingTop: Platform.OS === 'ios' ? 92 : 76, paddingRight: 12 },
+  profileMenuButton: { position: 'absolute', right: 16, top: topBarPadding(Platform.OS === 'ios' ? 50 : 34), padding: 4 },
+  profileHeartButton: { position: 'absolute', right: 52, top: topBarPadding(Platform.OS === 'ios' ? 50 : 34), padding: 4 },
+  sideMenuButton: { position: 'absolute', left: 16, top: topBarPadding(Platform.OS === 'ios' ? 50 : 34), zIndex: 10 },
+  profileMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-start', alignItems: 'flex-end', paddingTop: topBarPadding(Platform.OS === 'ios' ? 50 : 34) + 42, paddingRight: 12 },
   profileMenuCard: { backgroundColor: '#fff', borderRadius: 12, padding: 6, minWidth: 220, elevation: 6 },
   profileMenuOption: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 12, gap: 8 },
   profileMenuText: { color: '#333', fontSize: 14, fontWeight: '600' },

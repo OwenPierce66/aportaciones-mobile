@@ -4,7 +4,6 @@ import {
   Alert,
   FlatList,
   Modal,
-  Platform,
   RefreshControl,
   StyleSheet,
   Text,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import SideMenu from '../components/SideMenu';
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingTop: Platform.OS === 'android' ? 34 : 12,
+    paddingTop: topBarPadding(12),
     paddingBottom: 10,
     backgroundColor: '#fff',
     borderBottomWidth: 1,

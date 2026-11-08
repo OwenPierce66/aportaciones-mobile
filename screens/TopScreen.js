@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import {
-  Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View,
+  RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { getImageUrl } from '@api';
@@ -107,7 +108,7 @@ const TopScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FEF6F5' },
-  content: { paddingTop: Platform.OS === 'android' ? 34 : 16, paddingBottom: 24 },
+  content: { paddingTop: topBarPadding(16), paddingBottom: 24 },
   title: { fontSize: 24, fontWeight: '800', color: '#333', marginHorizontal: 16, marginBottom: 8 },
   block: { marginHorizontal: 12 },
   viewAsBanner: { marginHorizontal: 12, marginBottom: 12, borderRadius: 12 },

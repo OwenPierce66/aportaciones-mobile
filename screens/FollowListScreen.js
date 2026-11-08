@@ -2,13 +2,13 @@ import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Platform,
   RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    paddingTop: Platform.OS === 'android' ? 34 : 50,
+    paddingTop: topBarPadding(50),
     backgroundColor: '#fff',
   },
   backButton: { width: 32 },
