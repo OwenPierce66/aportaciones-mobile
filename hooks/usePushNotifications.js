@@ -26,8 +26,10 @@ export function usePushNotifications(navigationRef) {
     responseSub.current = Notifications.addNotificationResponseReceivedListener(
       (response) => {
         const data = response?.notification?.request?.content?.data ?? {};
-        if (navigationRef?.isReady?.() && data.notification_id) {
-          navigationRef.navigate('Home', {
+        // App.js pasa el ref de useRef: la navegación está en .current.
+        const navigation = navigationRef?.current ?? navigationRef;
+        if (navigation?.isReady?.() && data.notification_id) {
+          navigation.navigate('Home', {
             screen: 'Notifications',
             params: { screen: 'NotificationsMain', pop: true },
           });
