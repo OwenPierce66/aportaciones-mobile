@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, Modal, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../api';
 import { useMyRelations } from '../hooks/useMyRelations';

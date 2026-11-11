@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 
 const SideMenu = ({ navigation, signOut, user, buttonStyle }) => {
@@ -25,7 +25,7 @@ const SideMenu = ({ navigation, signOut, user, buttonStyle }) => {
 
   const openTaskMenu = paramName => {
     navigate('Tasks', {
-      screen: 'TasksList',
+      screen: 'TasksList', pop: true,
       params: { [paramName]: true },
     });
   };

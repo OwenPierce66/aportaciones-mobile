@@ -41,7 +41,7 @@ it('muestra tu top 5 y lo más votado del periodo; "ver todo" abre el feed con e
 
   await act(async () => { mockTopics.mock.calls.slice(-1)[0][0].onSelectTopic('peticiones'); });
   expect(parentNavigate).toHaveBeenCalledWith('Tasks', {
-    screen: 'TasksList', params: { topicPch: 'peticiones', topicSortBy: 'top_week' },
+    screen: 'TasksList', pop: true, params: { topicPch: 'peticiones', topicSortBy: 'top_week' },
   });
 
   await act(async () => { mockTopFive.mock.calls.slice(-1)[0][0].onOpenProfile({ id: 'ana', username: 'ana' }); });

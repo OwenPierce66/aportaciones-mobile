@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Modal from '../components/Modal';
 import { Ionicons } from '@expo/vector-icons';
 
 const ShareActionMenu = ({ isVisible, onClose, onShare, onSendMessage, onShareToStory }) => {

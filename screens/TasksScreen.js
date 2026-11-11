@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import {
   View, Text, FlatList, ScrollView, StyleSheet, TouchableOpacity, Dimensions,
-  RefreshControl, TextInput, Platform, ActivityIndicator, Modal, Alert, Button, SafeAreaView, useWindowDimensions,
-  InteractionManager, AppState, Animated, PanResponder
+  RefreshControl, TextInput, Platform, ActivityIndicator, Alert, Button, useWindowDimensions,
+  AppState, Animated, PanResponder
 } from 'react-native';
+import Modal from '../components/Modal';
 import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -13,7 +14,6 @@ import { Image } from 'expo-image';
 import TieredLikesModal from './TieredLikesModal';
 import FilterModal from '@components/FilterModal';
 import SavedFiltersModal from '@components/SavedFiltersModal';
-import { Video } from 'expo-av';
 import ShareModal from '@components/ShareModal';
 import { AuthContext } from '@app';
 import SideMenu from '@components/SideMenu';
@@ -592,7 +592,7 @@ const TasksScreen = ({ navigation, route }) => {
     const forumUser = selectedActionTask?.isSharedTask ? selectedActionTask.shared_by : selectedActionTask?.user;
     setActionModalVisible(false);
     navigation.navigate('Forum', {
-      screen: 'ForumMain',
+      screen: 'ForumMain', pop: true,
       params: forumUser?.id
         ? { userId: forumUser.id, userName: selectedActionTask?.isSharedTask ? getSharerName(forumUser) : getAuthorName(selectedActionTask) }
         : { userId: undefined, userName: undefined },
@@ -1102,13 +1102,17 @@ const TasksScreen = ({ navigation, route }) => {
       });
       feedScrollOffsetRef.current = mainFeedScrollOffsetRef.current;
     };
-    const interaction = InteractionManager.runAfterInteractions(() => {
-      requestAnimationFrame(() => {
-        restoreScroll();
-        requestAnimationFrame(restoreScroll);
-      });
+    // Cuando la app queda libre (RN 0.88 quitó InteractionManager: ahora es requestIdleCallback).
+    const restoreWhenIdle = () => requestAnimationFrame(() => {
+      restoreScroll();
+      requestAnimationFrame(restoreScroll);
     });
-    return () => interaction.cancel();
+    if (typeof requestIdleCallback === 'function') {
+      const idle = requestIdleCallback(restoreWhenIdle);
+      return () => cancelIdleCallback(idle);
+    }
+    const timer = setTimeout(restoreWhenIdle, 0);
+    return () => clearTimeout(timer);
   }, [searchExpanded]);
 
   const applySearchToMainFilter = () => {
@@ -1589,7 +1593,7 @@ const TasksScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.feedRoot}>
       <View style={styles.collapsingHeader} pointerEvents="box-none">
       {/* Titulo fijo: siempre visible (Inicio/Tareas, buscar, filtrar, crear) */}
@@ -2067,7 +2071,7 @@ const TasksScreen = ({ navigation, route }) => {
         messageTaskId={taskShareDetails?.messageTaskId}
         messageTaskType={taskShareDetails?.messageTaskType}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

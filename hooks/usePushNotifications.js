@@ -6,7 +6,9 @@ import api from '../api';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    // Con la app abierta: aviso arriba y en la lista de notificaciones (antes, shouldShowAlert).
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
@@ -27,7 +29,7 @@ export function usePushNotifications(navigationRef) {
         if (navigationRef?.isReady?.() && data.notification_id) {
           navigationRef.navigate('Home', {
             screen: 'Notifications',
-            params: { screen: 'NotificationsMain' },
+            params: { screen: 'NotificationsMain', pop: true },
           });
         }
       }

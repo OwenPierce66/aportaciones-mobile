@@ -46,7 +46,7 @@ const GroupFormScreen = ({ navigation, route }) => {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: Platform.OS !== 'web',
       aspect: [1, 1],
       quality: 1,

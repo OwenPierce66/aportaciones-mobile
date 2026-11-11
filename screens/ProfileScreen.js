@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
-  ActivityIndicator, RefreshControl, Platform, Modal, Alert,
+  ActivityIndicator, RefreshControl, Platform, Alert,
   ScrollView, useWindowDimensions,
 } from 'react-native';
+import Modal from '../components/Modal';
 import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
@@ -388,7 +389,7 @@ const ProfileScreen = ({ route, navigation }) => {
     }
     // Queda activo en el feed, Reels y Top hasta tocar "Salir".
     setViewAs({ id: socialUserId, username: user?.username || route?.params?.userName || '' });
-    navigation.getParent()?.navigate('Tasks', { screen: 'TasksList' });
+    navigation.getParent()?.navigate('Tasks', { screen: 'TasksList', pop: true });
   };
 
   // "Ver como yo": el dueño permite (o no) que otros vean su feed.
@@ -492,7 +493,7 @@ const ProfileScreen = ({ route, navigation }) => {
     setProfileMenuVisible(false);
     if (!socialUserId) return;
     navigation.navigate('Forum', {
-      screen: 'ForumMain',
+      screen: 'ForumMain', pop: true,
       params: { userId: socialUserId, userName: user?.username || user?.first_name || 'usuario' },
     });
   };

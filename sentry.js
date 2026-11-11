@@ -3,8 +3,8 @@
  *
  * Inicialización de Sentry para tracking de errores en producción.
  *
- * En web (webpack) el alias en webpack.config.js redirige
- * '@sentry/react-native' → 'sentry.web.stub.js' (no-ops seguros).
+ * En la web, metro.config.js cambia '@sentry/react-native' por 'sentry.web.stub.js'
+ * (no-ops seguros).
  *
  * ┌─ SETUP ──────────────────────────────────────────────────────────────────┐
  * │ 1. Crea un proyecto en https://sentry.io → Project type: React Native   │
@@ -18,7 +18,7 @@
  *   SentryService.captureMessage('Token refresh fallido', 'warning');
  */
 
-// En web webpack redirige este import al stub vacío vía alias en webpack.config.js
+// En la web, metro.config.js cambia este import por el stub vacío (sentry.web.stub.js)
 import * as Sentry from '@sentry/react-native';
 import Constants from 'expo-constants';
 

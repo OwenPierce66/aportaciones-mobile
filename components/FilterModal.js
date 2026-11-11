@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Animated, PanResponder } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView, Platform, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, TextInput, Alert } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons'; // Switch no se usa aquí, se usa en el componente ToggleOption
 import api from '../api';
 import CategorySearchInput from './CategorySearchInput';

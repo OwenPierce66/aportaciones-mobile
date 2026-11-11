@@ -5,7 +5,6 @@ import {
   Dimensions,
   Image as RNImage,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -15,10 +14,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Modal from '../components/Modal';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from '../components/Video';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api, { getImageUrl, UPLOAD_TIMEOUT_MS } from '../api';

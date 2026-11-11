@@ -92,7 +92,7 @@ const ForgotPasswordScreen = ({ navigation, route }) => {
         { email: email.trim(), code: code.trim(), new_password: password },
         { timeout: SLOW_SERVER_TIMEOUT_MS },
       );
-      navigation.navigate('Login', { email: response.data.email || email.trim(), notice: response.data.detail });
+      navigation.navigate('Login', { email: response.data.email || email.trim(), notice: response.data.detail }, { pop: true });
     } catch (error) {
       showError(error, 'No se pudo cambiar la contraseña. Revisa tu conexión e intenta de nuevo.');
     } finally {

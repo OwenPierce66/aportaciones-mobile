@@ -38,7 +38,7 @@ export const isVideoAsset = (asset) => {
 /** Abre la galería para elegir una foto o un video; null si se cancela. */
 export async function pickPhotoOrVideo() {
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    mediaTypes: ['images', 'videos'],
     allowsEditing: false,
     quality: 0.8,
   });

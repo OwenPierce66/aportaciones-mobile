@@ -1,74 +1,25 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext {
-        buildToolsVersion = findProperty('android.buildToolsVersion') ?: '33.0.0'
-        minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '21')
-        compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '33')
-        targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '33')
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.8.10'
-        frescoVersion = findProperty('expo.frescoVersion') ?: '2.5.0'
-
-        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
-        ndkVersion = "26.1.10909125"
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath('com.android.tools.build:gradle:7.4.2')
-        classpath('com.facebook.react:react-native-gradle-plugin')
-    }
+  repositories {
+    google()
+    mavenCentral()
+  }
+  dependencies {
+    classpath('com.android.tools.build:gradle')
+    classpath('com.facebook.react:react-native-gradle-plugin')
+    def kotlinVersion = findProperty('android.kotlinVersion')
+    classpath(kotlinVersion ? "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion" : 'org.jetbrains.kotlin:kotlin-gradle-plugin')
+  }
 }
 
 allprojects {
-    repositories {
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url(new File(['node', '--print', "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), '../android'))
-        }
-        maven {
-            // Android JSC is installed from npm
-            url(new File(['node', '--print', "require.resolve('jsc-android/package.json')"].execute(null, rootDir).text.trim(), '../dist'))
-        }
-
-        google()
-        mavenCentral()
-        maven { url 'https://www.jitpack.io' }
-    }
+  repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+  }
 }
 
-// Forzar el NDK instalado localmente (26.1) en todos los modulos: AGP 7.4 usa NDK 23 por defecto
-// (reanimated, etc.) y su descarga automatica se queda colgada.
-subprojects { subproject ->
-    afterEvaluate {
-        if (subproject.hasProperty('android')) {
-            subproject.android.ndkVersion = rootProject.ext.ndkVersion
-        }
-    }
-}
-
-// expo-constants mete app.config.js en el APK (de ahí salen los IDs de Google), pero su tarea no
-// lee el .env ni declara de qué depende: Gradle reusaba una copia vieja. Se rehace siempre, con el
-// .env (las variables que ya estén en la terminal mandan, como en Expo).
-def dotEnvVars = [:]
-def dotEnvFile = file("../.env")
-if (dotEnvFile.exists()) {
-    dotEnvFile.eachLine { line ->
-        line = line.trim()
-        if (line && !line.startsWith("#") && line.contains("=")) {
-            def key = line.substring(0, line.indexOf("=")).trim()
-            def value = line.substring(line.indexOf("=") + 1).trim().replaceAll(/^["']|["']$/, "")
-            if (!System.getenv().containsKey(key)) dotEnvVars[key] = value
-        }
-    }
-}
-subprojects { subproject ->
-    if (subproject.name == 'expo-constants') {
-        subproject.tasks.matching { it.name ==~ /create.*ExpoConfig/ }.configureEach { task ->
-            task.environment(dotEnvVars)
-            task.outputs.upToDateWhen { false }
-        }
-    }
-}
+apply plugin: "expo-root-project"
+apply plugin: "com.facebook.react.rootproject"

@@ -2,8 +2,9 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, 
   KeyboardAvoidingView, Platform, ActivityIndicator, Alert,
-  Animated, PanResponder, Image as RNImage, Modal, Switch
+  Animated, PanResponder, Image as RNImage, Switch
 } from 'react-native';
+import Modal from '../components/Modal';
 import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
@@ -11,7 +12,7 @@ import api, { getImageUrl, UPLOAD_TIMEOUT_MS } from '@api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { Video } from 'expo-av';
+import Video from '../components/Video';
 import TouchableUsername from '@components/TouchableUsername';
 import FollowHeart from '@components/FollowHeart';
 import { CommentAttachMenu } from '@components/CommentAttachments';
@@ -531,7 +532,7 @@ const ChatDetailScreen = ({ route, navigation }) => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ['images', 'videos'],
       allowsEditing: false,
       quality: 0.8,
     });

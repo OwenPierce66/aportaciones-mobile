@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Platform } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslationLanguage } from '@hooks/useTranslationLanguage';
 import { LANGUAGE_NAMES } from '../utils/translation';

@@ -6,7 +6,8 @@
  * cierra con la X, tocándola o con el botón de regresar del celular.
  */
 import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 

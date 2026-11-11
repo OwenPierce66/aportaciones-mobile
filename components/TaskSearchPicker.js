@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View,
+  ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import api from '@api';
 

@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import moment from 'moment';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from './Video';
 import Slider from '@react-native-community/slider';
 import { getImageUrl } from '@api';
 import TouchableUsername from '@components/TouchableUsername';

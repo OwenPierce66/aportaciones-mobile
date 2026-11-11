@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Modal, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Platform,
+  View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Platform,
   ActivityIndicator, KeyboardAvoidingView,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import api from '@api';
 import { NameWithBadges } from './UserBadges';

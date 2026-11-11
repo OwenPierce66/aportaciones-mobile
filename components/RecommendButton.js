@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
-  ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, StyleSheet,
+  ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet,
   Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 

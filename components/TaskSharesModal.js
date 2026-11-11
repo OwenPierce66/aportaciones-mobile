@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator, FlatList, Modal, Platform, StyleSheet, Text, TouchableOpacity, View,
+  ActivityIndicator, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { FeedVideoVisibilityContext } from '@components/TaskPostCard';
 

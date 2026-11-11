@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from './Video';
 import { getImageUrl } from '@api';
 import { isVideoAsset } from '../utils/mediaUpload';
 

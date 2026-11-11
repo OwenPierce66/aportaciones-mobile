@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Switch,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Switch,
   ActivityIndicator, KeyboardAvoidingView, Alert,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { useSubscriptionCheckout } from '@hooks/useSubscriptionCheckout';
 import {

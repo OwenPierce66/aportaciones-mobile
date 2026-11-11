@@ -8,7 +8,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from './Video';
 import { fillsBox, imageSizeFromLoad, useMediaRatio, videoSizeFromReady } from '../utils/mediaLayout';
 
 const ReelClipMedia = ({ type, uri, boxRatio, videoRef, videoProps }) => {

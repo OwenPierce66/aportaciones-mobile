@@ -1,5 +1,6 @@
 ﻿﻿﻿﻿﻿﻿import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
+import Modal from '../components/Modal';
 import { Ionicons } from '@expo/vector-icons';
 
 const FilterOption = ({ label, value, selectedValue, onSelect }) => (

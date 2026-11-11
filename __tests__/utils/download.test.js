@@ -3,8 +3,8 @@
  *
  * "Descargar" del menú de 3 puntos: imágenes y videos de una aportación.
  */
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as MediaLibrary from 'expo-media-library/legacy';
 import {
   DownloadPermissionError,
   downloadMedia,
@@ -18,13 +18,13 @@ jest.mock('@api', () => ({
   getImageUrl: (path) => (path ? (String(path).startsWith('http') ? path : `https://api.test${path}`) : null),
 }));
 
-jest.mock('expo-file-system', () => ({
+jest.mock('expo-file-system/legacy', () => ({
   cacheDirectory: 'file:///cache/',
   downloadAsync: jest.fn(),
   deleteAsync: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('expo-media-library', () => ({
+jest.mock('expo-media-library/legacy', () => ({
   requestPermissionsAsync: jest.fn(),
   saveToLibraryAsync: jest.fn(() => Promise.resolve()),
 }));

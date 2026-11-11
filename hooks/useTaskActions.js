@@ -83,7 +83,7 @@ export default function useTaskActions({
   const goToForum = useCallback(() => {
     close?.();
     navigation.navigate('Forum', {
-      screen: 'ForumMain',
+      screen: 'ForumMain', pop: true,
       params: targetUser?.id
         ? { userId: targetUser.id, userName: userDisplayName(targetUser, 'usuario') }
         : { userId: undefined, userName: undefined },

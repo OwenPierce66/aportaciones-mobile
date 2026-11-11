@@ -266,7 +266,7 @@ const NotificationsScreen = ({ navigation }) => {
       case 'testimonial':
         // Un testimonio escrito en mi perfil: mis testimonios, donde decido si se muestra.
         navigation.getParent()?.navigate('Profile', {
-          screen: 'ProfileMain', params: { initialView: 'testimonials' },
+          screen: 'ProfileMain', pop: true, params: { initialView: 'testimonials' },
         });
         break;
       case 'group':

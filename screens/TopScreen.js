@@ -50,7 +50,7 @@ const TopScreen = ({ navigation }) => {
 
   // "Ver todo" de un tipo: el feed de Aportaciones con ese tipo y el mismo periodo.
   const openTopic = (pch) => navigation.getParent()?.navigate('Tasks', {
-    screen: 'TasksList', params: { topicPch: pch, topicSortBy: period },
+    screen: 'TasksList', pop: true, params: { topicPch: pch, topicSortBy: period },
   });
 
   return (

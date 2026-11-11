@@ -85,7 +85,7 @@ it('cambia la contraseña y vuelve al login con el aviso y el correo', async () 
     { email: 'ANA@example.com', code: '123456', new_password: 'clave-nueva-1' },
     expect.any(Object),
   );
-  expect(navigation.navigate).toHaveBeenCalledWith('Login', { email: 'ana@example.com', notice: 'Tu contraseña se cambió.' });
+  expect(navigation.navigate).toHaveBeenCalledWith('Login', { email: 'ana@example.com', notice: 'Tu contraseña se cambió.' }, { pop: true });
   act(() => renderer.unmount());
 });
 

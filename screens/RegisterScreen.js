@@ -260,7 +260,7 @@ const RegisterScreen = ({ navigation }) => {
 
         <View style={styles.loginLink}>
           <Text style={styles.linkText}>¿Ya tienes cuenta?{' '}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login', undefined, { pop: true })}>
             <Text style={[styles.linkText, styles.linkAction]}>Iniciar sesión</Text>
           </TouchableOpacity>
         </View>

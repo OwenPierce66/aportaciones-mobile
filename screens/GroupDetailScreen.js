@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator, Alert, Modal,
-  Platform, useWindowDimensions,
+  View, Text, StyleSheet, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator, Alert, Platform, useWindowDimensions,
 } from 'react-native';
+import Modal from '../components/Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useQueryClient } from '@tanstack/react-query';
@@ -322,7 +322,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
           <TouchableOpacity
             style={styles.forumButton}
             onPress={() => navigation.getParent()?.navigate('Forum', {
-              screen: 'ForumMain', params: { groupId: group.id, groupName: group.name },
+              screen: 'ForumMain', pop: true, params: { groupId: group.id, groupName: group.name },
             })}
             accessibilityRole="button"
             accessibilityLabel="Abrir el foro del grupo"

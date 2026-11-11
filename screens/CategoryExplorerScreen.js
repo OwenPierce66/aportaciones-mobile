@@ -110,7 +110,7 @@ const CategoryExplorerScreen = ({ navigation, route }) => {
 
   // El feed de Aportaciones ya filtrado por esta categoría.
   const openFeed = () => navigation.getParent()?.navigate('Tasks', {
-    screen: 'TasksList', params: { categoryPath: path.join(','), categoryPch: pch },
+    screen: 'TasksList', pop: true, params: { categoryPath: path.join(','), categoryPch: pch },
   });
 
   const onUpdated = () => queryClient.invalidateQueries({ queryKey: ['categories'] });

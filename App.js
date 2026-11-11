@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef, useMemo, useCallback, createContext
 import { View, Image, ActivityIndicator, LogBox } from 'react-native';
 LogBox.ignoreLogs(['[Sentry] DSN no configurado']);
 import { NavigationContainer } from '@react-navigation/native';
+import { initialWindowMetrics, SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StatusBar } from 'expo-status-bar';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { useAndroidKeyboardHeight } from './hooks/useAndroidKeyboardHeight';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SecureStorage from './secureStorage';
@@ -106,6 +111,37 @@ const Tab = createBottomTabNavigator();
 
 // Contextos globales
 export const AuthContext = createContext();
+
+// Dentro del marco ya no hay barras que esquivar: se empieza en cero (y no en blanco un cuadro).
+const NO_INSETS = { frame: { x: 0, y: 0, width: 0, height: 0 }, insets: { top: 0, left: 0, right: 0, bottom: 0 } };
+
+/**
+ * La app se dibuja hasta los bordes de la pantalla (Android 15+ lo exige), así que aquí se deja
+ * libre el espacio de la barra de estado y de la de navegación del teléfono, sobre blanco, como
+ * se veía antes, y el del teclado cuando está abierto. Dentro va otro SafeAreaProvider para que
+ * las pantallas y la barra de pestañas no vuelvan a sumar ese espacio.
+ */
+const SystemBarsFrame = ({ children }) => {
+  // Con el teclado abierto, su alto (que ya cubre la barra de navegación) va en lugar del margen
+  // de abajo.
+  const keyboardHeight = useAndroidKeyboardHeight();
+  return (
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      {/* Solo avisa del teclado (también en los Modal): los márgenes los pone SafeAreaView. */}
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
+        <StatusBar style="dark" />
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: '#fff', paddingBottom: keyboardHeight }}
+          edges={keyboardHeight ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
+        >
+          <SafeAreaProvider initialMetrics={NO_INSETS}>
+            <GestureHandlerRootView style={{ flex: 1 }}>{children}</GestureHandlerRootView>
+          </SafeAreaProvider>
+        </SafeAreaView>
+      </KeyboardProvider>
+    </SafeAreaProvider>
+  );
+};
 
 const TasksStackNavigator = () => {
   return (
@@ -547,44 +583,48 @@ signIn: async (token) => {
   }
 
   return (
-    <ErrorBoundary>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{
-          persister: asyncStoragePersister,
-          maxAge: MAX_AGE_MS,
-          dehydrateOptions: {
-            shouldDehydrateQuery: shouldPersistQuery,
-          },
-        }}
-        onSuccess={() => {
-          // Cache restaurado desde AsyncStorage — reanudar mutaciones pausadas
-          queryClient.resumePausedMutations();
-        }}
-      >
-        <ToastProvider>
-          <OfflineWriteNotifier />
-          <GlobalErrorContext.Provider value={{ isConnected, wasDisconnected }}>
-            <AuthContext.Provider value={authContext}>
-              <NavigationContainer linking={linking} ref={navigationRef}>
-                {/* Banner flotante de conectividad - flota sobre toda la app */}
-                <GlobalError />
-                <Stack.Navigator screenOptions={{ headerShown: false }}>{
-                  state.userToken == null ? (
-                    <>
-                      <Stack.Screen name="Login" component={LoginScreen} />
-                      <Stack.Screen name="Register" component={RegisterScreen} />
-                      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-                    </>
-                  ) : (
-                    <Stack.Screen name="Home" component={AuthenticatedTabs} />
-                  )}
-                </Stack.Navigator>
-              </NavigationContainer>
-            </AuthContext.Provider>
-          </GlobalErrorContext.Provider>
-        </ToastProvider>
-      </PersistQueryClientProvider>
-    </ErrorBoundary>
+    <SystemBarsFrame>
+      <ErrorBoundary>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{
+            persister: asyncStoragePersister,
+            maxAge: MAX_AGE_MS,
+            dehydrateOptions: {
+              shouldDehydrateQuery: shouldPersistQuery,
+            },
+          }}
+          onSuccess={() => {
+            // Cache restaurado desde AsyncStorage — reanudar mutaciones pausadas
+            queryClient.resumePausedMutations();
+          }}
+        >
+          <ToastProvider>
+            <OfflineWriteNotifier />
+            <GlobalErrorContext.Provider value={{ isConnected, wasDisconnected }}>
+              <AuthContext.Provider value={authContext}>
+                {/* navigationInChildEnabled: navigate('Pantalla') también llega a las pilas de otras
+                    pestañas, como en React Navigation 6 (las pantallas lo usan así). */}
+                <NavigationContainer linking={linking} ref={navigationRef} navigationInChildEnabled>
+                  {/* Banner flotante de conectividad - flota sobre toda la app */}
+                  <GlobalError />
+                  <Stack.Navigator screenOptions={{ headerShown: false }}>{
+                    state.userToken == null ? (
+                      <>
+                        <Stack.Screen name="Login" component={LoginScreen} />
+                        <Stack.Screen name="Register" component={RegisterScreen} />
+                        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+                      </>
+                    ) : (
+                      <Stack.Screen name="Home" component={AuthenticatedTabs} />
+                    )}
+                  </Stack.Navigator>
+                </NavigationContainer>
+              </AuthContext.Provider>
+            </GlobalErrorContext.Provider>
+          </ToastProvider>
+        </PersistQueryClientProvider>
+      </ErrorBoundary>
+    </SystemBarsFrame>
   );
 }

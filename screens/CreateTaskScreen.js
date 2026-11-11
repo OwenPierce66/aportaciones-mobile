@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   View, Text, TextInput, ScrollView, TouchableOpacity, 
-  StyleSheet, Alert, ActivityIndicator, Platform, Modal, FlatList 
+  StyleSheet, Alert, ActivityIndicator, Platform, FlatList 
 } from 'react-native';
+import Modal from '../components/Modal';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import api, { getImageUrl, UPLOAD_TIMEOUT_MS } from '@api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from '../components/Video';
 import { useCreateTaskCategories, useIsAdmin } from '@hooks/useApi';
 import { compressImage } from '../utils/compressImage';
 import { withLegacyLink } from '../utils/links';
@@ -305,7 +306,7 @@ const CreateTaskScreen = ({ navigation, route }) => {
 
   const pickImage = async (state, setState, index) => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ['images', 'videos'],
       // ⚡ FIX: Aseguramos que la edición y calidad también apliquen a videos
       allowsEditing: Platform.OS !== 'web', // La edición en web puede ser problemática con videos
       quality: 1, // Pedimos calidad máxima al picker y comprimimos imágenes nosotros

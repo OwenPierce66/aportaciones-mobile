@@ -8,7 +8,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import TestRenderer, { act } from 'react-test-renderer';
 import { Image } from 'expo-image';
-import { Video } from 'expo-av';
+import Video from '../../components/Video';
 import { FeedImage, TaskVideoPreview } from '../../components/TaskPostCard';
 import ReelClipMedia from '../../components/ReelClipMedia';
 

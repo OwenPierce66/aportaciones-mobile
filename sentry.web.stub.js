@@ -1,12 +1,9 @@
 /**
  * sentry.web.stub.js
  *
- * Stub vacío de @sentry/react-native para el bundle web (webpack).
- * Webpack no puede procesar @sentry/react-native porque contiene JSX no
- * transpilado, TurboModuleRegistry y otros módulos nativos incompatibles.
- *
- * Este archivo se carga en su lugar gracias al alias en webpack.config.js:
- *   '@sentry/react-native' → './sentry.web.stub.js'
+ * Stub vacío de @sentry/react-native para la versión web: en el navegador no se manda nada a
+ * Sentry. metro.config.js lo pone en lugar de '@sentry/react-native' (y de sus archivos) cuando
+ * se arma la web.
  *
  * Exporta los mismos símbolos que usa nuestro sentry.js para que no haya
  * errores de referencia, pero todas las funciones son no-ops.

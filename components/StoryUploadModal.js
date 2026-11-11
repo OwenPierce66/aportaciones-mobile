@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  View, Text, Modal, TouchableOpacity, TextInput, Platform, StyleSheet, Image as RNImage,
+  View, Text, TouchableOpacity, TextInput, Platform, StyleSheet, Image as RNImage,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
+import Video from './Video';
 import * as ImagePicker from 'expo-image-picker';
 import api, { UPLOAD_TIMEOUT_MS } from '@api';
 
@@ -78,7 +79,7 @@ const StoryUploadModal = ({ visible, onClose, onUploaded }) => {
 
   const pickStoryMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ['images', 'videos'],
       allowsEditing: Platform.OS !== 'web',
       quality: 0.8,
       videoExportPreset: ImagePicker.VideoExportPreset.H264_1280x720,

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import api from '@api';
 

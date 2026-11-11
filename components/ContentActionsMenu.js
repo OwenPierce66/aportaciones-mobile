@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { getImageUrl } from '@api';
 import useProfileActions from '../hooks/useProfileActions';
@@ -47,7 +48,7 @@ export const ContentActionsMenu = ({
     avatar: getImageUrl(author.user_image),
   }));
   const goToForum = then(() => navigation?.navigate('Forum', {
-    screen: 'ForumMain',
+    screen: 'ForumMain', pop: true,
     params: { userId: author.id, userName: name },
   }));
   const openReport = () => {

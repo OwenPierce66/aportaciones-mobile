@@ -74,7 +74,7 @@ describe('LinkifiedText', () => {
     });
 
     act(() => { tags[1].props.onPress(); });
-    expect(navigation.navigate).toHaveBeenLastCalledWith('Tasks', { screen: 'TasksList', params: { searchQuery: '#Viaje' } });
+    expect(navigation.navigate).toHaveBeenLastCalledWith('Tasks', { screen: 'TasksList', pop: true, params: { searchQuery: '#Viaje' } });
   });
 
   it('un correo o una @ dentro de un enlace no son menciones', () => {

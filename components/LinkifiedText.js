@@ -28,7 +28,7 @@ export async function openMention(navigation, username) {
 
 /** #tema: la búsqueda de Aportaciones con ese hashtag. */
 export function openHashtag(navigation, hashtag) {
-  navigation?.navigate('Tasks', { screen: 'TasksList', params: { searchQuery: `#${hashtag}` } });
+  navigation?.navigate('Tasks', { screen: 'TasksList', pop: true, params: { searchQuery: `#${hashtag}` } });
 }
 
 /**

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Modal, View, Text, TouchableOpacity, StyleSheet, Platform,
+  View, Text, TouchableOpacity, StyleSheet, Platform,
   ActivityIndicator, KeyboardAvoidingView, Alert,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { usePetitionSupportCheckout } from '@hooks/usePetitionSupport';
 import { CURRENCIES, amountError, formatMoney, parseAmount, subscriptionErrorMessage } from '../utils/subscriptions';

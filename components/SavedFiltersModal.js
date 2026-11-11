@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
+  View, Text, StyleSheet, TouchableOpacity, TextInput,
   FlatList, ActivityIndicator, Alert, Platform,
 } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../api';
 

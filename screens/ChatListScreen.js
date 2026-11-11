@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Modal,
   RefreshControl,
   StyleSheet,
   Text,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Modal from '../components/Modal';
 import { topBarPadding } from '../utils/topBar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';

@@ -50,7 +50,7 @@ export const fillsBox = (mediaRatio, boxRatio) => (
 /** Tamaño de una foto desde el onLoad de expo-image. */
 export const imageSizeFromLoad = (event) => event?.source || null;
 
-/** Tamaño de un video desde el onReadyForDisplay de expo-av (celular o web). */
+/** Tamaño de un video desde el onReadyForDisplay de components/Video (celular o web). */
 export function videoSizeFromReady(event) {
   const natural = event?.naturalSize;
   if (natural?.width && natural?.height) {

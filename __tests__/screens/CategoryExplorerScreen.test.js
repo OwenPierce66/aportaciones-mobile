@@ -103,7 +103,7 @@ it('"Ver publicaciones" abre el feed filtrado por esa categoría', async () => {
   expect(mockCategories).toHaveBeenLastCalledWith('peticiones');
   await press(renderer, 'Ver publicaciones de Nutrición');
   expect(parentNavigate).toHaveBeenCalledWith('Tasks', {
-    screen: 'TasksList', params: { categoryPath: 'Salud,Nutrición', categoryPch: 'peticiones' },
+    screen: 'TasksList', pop: true, params: { categoryPath: 'Salud,Nutrición', categoryPch: 'peticiones' },
   });
   await press(renderer, 'Abrir publicación Desayuno sano');
   expect(navigation.push).toHaveBeenCalledWith('TaskDetail', { taskId: 't1' });

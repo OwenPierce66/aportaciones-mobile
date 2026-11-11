@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions, Platform, TouchableOpacity, ActivityIndicator, Modal, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, Platform, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';

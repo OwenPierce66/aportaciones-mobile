@@ -278,7 +278,8 @@ const PostDetailScreen = () => {
   // Un #hashtag del foro abre el foro (el del grupo, si el post es de uno) con ese hashtag.
   const openForumHashtag = (hashtag) => {
     const group = post?.group_info;
-    navigation.navigate('ForumMain', group ? { hashtag, groupId: group.id, groupName: group.name } : { hashtag });
+    // pop: regresa al foro que ya está abajo en la pila en vez de abrir otro (React Navigation 7).
+    navigation.navigate('ForumMain', group ? { hashtag, groupId: group.id, groupName: group.name } : { hashtag }, { pop: true });
   };
 
   const editReply = (reply) => {
@@ -385,7 +386,7 @@ const PostDetailScreen = () => {
             <>
               {post.content ? <LinkifiedText style={styles.postContent} text={post.content} onHashtagPress={openForumHashtag} /> : null}
               {/* Tocar una categoría abre el foro filtrado por ella. */}
-              <CategoryChips categories={post.categories} onPress={category => navigation.navigate('ForumMain', { category })} />
+              <CategoryChips categories={post.categories} onPress={category => navigation.navigate('ForumMain', { category }, { pop: true })} />
               <MessageExtrasView item={post} navigation={navigation} />
             </>
           )}

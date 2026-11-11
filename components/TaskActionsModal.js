@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform, ScrollView, useWindowDimensions, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, ScrollView, useWindowDimensions, Alert } from 'react-native';
+import Modal from './Modal';
 import api from '@api';
 import { Ionicons } from '@expo/vector-icons';
 import { getActionTaskInfo } from '@hooks/useTaskActions';

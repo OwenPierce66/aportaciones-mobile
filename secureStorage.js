@@ -2,20 +2,21 @@
  * secureStorage.js
  *
  * Wrapper de almacenamiento seguro multiplataforma:
- * - En Android/iOS: usa react-native-encrypted-storage (Keystore/Keychain cifrado por hardware)
+ * - En Android/iOS: usa expo-secure-store (Android Keystore / iOS Keychain)
  * - En Web:         usa AsyncStorage como fallback (los navegadores no tienen Keystore nativo)
  *
  * Importa siempre desde aquí, nunca directamente de las librerías nativas.
+ *
+ * Antes era react-native-encrypted-storage, que no sirve con la arquitectura nueva de React
+ * Native: al instalar esta versión encima de una vieja, la sesión guardada no se lee y hay que
+ * entrar de nuevo una vez.
  */
 
-import { Platform, NativeModules } from 'react-native';
+import { Platform } from 'react-native';
 
 let storage;
 
-const hasNativeEncryptedStorage = Boolean(NativeModules?.RNEncryptedStorage);
-
-if (Platform.OS === 'web' || !hasNativeEncryptedStorage) {
-  // Web o entorno sin módulo nativo compilado (ej. Expo Go): fallback a AsyncStorage
+if (Platform.OS === 'web') {
   const AsyncStorage = require('@react-native-async-storage/async-storage').default;
 
   storage = {
@@ -24,13 +25,12 @@ if (Platform.OS === 'web' || !hasNativeEncryptedStorage) {
     removeItem: (key)        => AsyncStorage.removeItem(key),
   };
 } else {
-  // Móvil nativo con módulo compilado (Android Keystore / iOS Keychain)
-  const EncryptedStorage = require('react-native-encrypted-storage').default;
+  const SecureStore = require('expo-secure-store');
 
   storage = {
-    setItem:    (key, value) => EncryptedStorage.setItem(key, value),
-    getItem:    (key)        => EncryptedStorage.getItem(key),
-    removeItem: (key)        => EncryptedStorage.removeItem(key),
+    setItem:    (key, value) => SecureStore.setItemAsync(key, value),
+    getItem:    (key)        => SecureStore.getItemAsync(key),
+    removeItem: (key)        => SecureStore.deleteItemAsync(key),
   };
 }
 

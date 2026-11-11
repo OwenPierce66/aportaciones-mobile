@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Modal, View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import Modal from './Modal';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';

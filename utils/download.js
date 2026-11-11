@@ -6,8 +6,9 @@
  * descargan desde el navegador.
  */
 import { Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+// Desde Expo 54 estas funciones viven en /legacy: importadas de la raíz lanzan un error.
+import * as FileSystem from 'expo-file-system/legacy';
+import * as MediaLibrary from 'expo-media-library/legacy';
 import { getImageUrl } from '@api';
 import { buildPlaylists } from '../screens/reelUtils';
 
