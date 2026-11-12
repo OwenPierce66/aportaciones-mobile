@@ -330,6 +330,17 @@ const ReelsScreen = ({ route }) => {
     setReels(serverReels);
   }, [serverReels]);
 
+  // Si lo cargado no trae ningún reel (p. ej. con "solo videos" y una primera página sin videos),
+  // la lista vacía nunca pide más y la pantalla se queda negra: se piden las páginas siguientes
+  // hasta encontrar uno o llegar al final.
+  const noReelsYet = serverReels.length === 0;
+  useEffect(() => {
+    if (noReelsYet && hasNextPage && !isFetchingNextPage && !reelsQuery.isLoading && !reelsQuery.isError) {
+      fetchNextPage();
+    }
+  }, [noReelsYet, hasNextPage, isFetchingNextPage, reelsQuery.isLoading, reelsQuery.isError, fetchNextPage]);
+  const searchingMoreReels = noReelsYet && (hasNextPage || isFetchingNextPage);
+
   const fetchTaskLikesSummary = useCallback(async (taskId) => {
     if (!taskId || taskLikesCacheRef.current[taskId]?.status) return;
     taskLikesCacheRef.current[taskId] = { status: "loading" };
@@ -693,7 +704,7 @@ const ReelsScreen = ({ route }) => {
             <Ionicons name="options-outline" size={28} color="#fff" style={styles.filterButtonIcon} />
           </TouchableOpacity>
         )}
-        {loading && reels.length === 0 ? (
+        {(loading || searchingMoreReels) && reels.length === 0 ? (
           <ActivityIndicator size="large" color="#fff" style={{flex: 1, justifyContent: 'center'}} />
         ) : loadError && reels.length === 0 ? (
           <OfflineEmptyState
@@ -702,6 +713,13 @@ const ReelsScreen = ({ route }) => {
             onRetry={() => refetchReels()}
             message={isOnline ? 'No se pudieron cargar los reels. Inténtalo de nuevo.' : undefined}
           />
+        ) : reels.length === 0 ? (
+          <View style={styles.emptyReels}>
+            <Ionicons name="videocam-outline" size={42} color="#666" />
+            <Text style={styles.emptyReelsText}>
+              {selectedVideosOnly ? 'Todavía no hay reels con video en este tema.' : 'Todavía no hay reels en este tema.'}
+            </Text>
+          </View>
         ) : (
           // ✅ FIX: Usamos un solo View con flex: 1 para contener una única FlatList.
           // Esto asegura que la lista ocupe el espacio correcto y la virtualización funcione.
@@ -809,6 +827,8 @@ const ReelsScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
+  emptyReels: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
+  emptyReelsText: { color: '#aaa', fontSize: 15, textAlign: 'center' },
   topBar: { position: 'absolute', top: Platform.OS === 'ios' ? 50 : 42, width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 15, pointerEvents: 'box-none' },
   topBarLeft: { flex: 1, minHeight: 36, justifyContent: 'center', alignItems: 'flex-start' },
   reelsMenuButton: { padding: 4 },
