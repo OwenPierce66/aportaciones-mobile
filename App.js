@@ -127,8 +127,9 @@ const SystemBarsFrame = ({ children }) => {
   const keyboardHeight = useAndroidKeyboardHeight();
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      {/* Solo avisa del teclado (también en los Modal): los márgenes los pone SafeAreaView. */}
-      <KeyboardProvider statusBarTranslucent navigationBarTranslucent preserveEdgeToEdge>
+      {/* Solo avisa del teclado (también en los Modal); de borde a borde no toca los márgenes,
+          que los pone SafeAreaView. */}
+      <KeyboardProvider>
         <StatusBar style="dark" />
         <SafeAreaView
           style={{ flex: 1, backgroundColor: '#fff', paddingBottom: keyboardHeight }}
@@ -307,6 +308,8 @@ const ProfileStackNavigator = () => {
   );
 };
 
+const HIDDEN_TAB = { tabBarButton: () => null, tabBarItemStyle: { display: 'none' } };
+
 const AuthenticatedTabs = () => {
   const { user } = React.useContext(AuthContext);
   const profileImage = user?.user_image || user?.profile?.user_image;
@@ -361,26 +364,27 @@ const AuthenticatedTabs = () => {
       <Tab.Screen name="Messages" component={MessagesStackNavigator} options={{ tabBarLabel: 'Mensajes' }} />
       <Tab.Screen name="Notifications" component={NotificationsStackNavigator} options={{ tabBarLabel: 'Notificaciones' }} />
       <Tab.Screen name="Profile" component={ProfileStackNavigator} options={{ tabBarLabel: 'Perfil' }} />
-      {/* Sin botón en la barra de abajo: se abren desde el menú lateral. */}
+      {/* Sin botón en la barra de abajo: se abren desde el menú lateral. Con React Navigation 7
+          hace falta también display: 'none', o la barra les guarda su lugar vacío. */}
       <Tab.Screen
         name="Map"
         component={MapScreen}
-        options={{ tabBarButton: () => null }}
+        options={HIDDEN_TAB}
       />
       <Tab.Screen
         name="Stories"
         component={Stories24hScreen}
-        options={{ tabBarButton: () => null }}
+        options={HIDDEN_TAB}
       />
       <Tab.Screen
         name="SharedTasks"
         component={SharedTasksStackNavigator}
-        options={{ tabBarButton: () => null }}
+        options={HIDDEN_TAB}
       />
       <Tab.Screen
         name="Forum"
         component={ForumStackNavigator}
-        options={{ tabBarButton: () => null }}
+        options={HIDDEN_TAB}
       />
       </Tab.Navigator>
     </NotificationsProvider>

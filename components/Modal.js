@@ -2,11 +2,14 @@
  * components/Modal.js
  *
  * El Modal de React Native, con el espacio de las barras del teléfono (y del teclado en
- * Android, ver hooks/useAndroidKeyboardHeight) libre, como se veía antes. Desde Android 15 la app se dibuja hasta los bordes y los
- * Modal también: sin esto, los encabezados quedan debajo de la barra de estado y los botones de
- * abajo debajo de la barra de navegación. Mismas props que el de React Native.
+ * Android, ver hooks/useAndroidKeyboardHeight) libre, como se veía antes. Desde Android 15 la
+ * app se dibuja hasta los bordes y los Modal también: sin esto, los encabezados quedan debajo de
+ * la barra de estado y los botones de abajo debajo de la barra de navegación. Mismas props que el
+ * de React Native.
  *
  * `statusBarTranslucent`: el contenido sí llega hasta arriba (p. ej. fotos a pantalla completa).
+ * Al Modal de React Native siempre le llegan las dos barras translúcidas (de borde a borde
+ * Android las pone así de todos modos, y RN no acepta solo una); el espacio lo deja SafeAreaView.
  */
 import React from 'react';
 import { Modal as NativeModal } from 'react-native';
@@ -25,7 +28,7 @@ const edgesFor = (statusBarTranslucent, keyboardOpen) => [
 export default function Modal({ children, statusBarTranslucent = false, ...props }) {
   const keyboardHeight = useAndroidKeyboardHeight(props.visible !== false);
   return (
-    <NativeModal {...props} statusBarTranslucent={statusBarTranslucent} navigationBarTranslucent>
+    <NativeModal {...props} statusBarTranslucent navigationBarTranslucent>
       {/* El Modal ocupa la pantalla como la ventana principal: sus medidas sirven de inicio, así
           el contenido sale desde el primer cuadro. */}
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
