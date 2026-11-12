@@ -31,10 +31,13 @@ export const UPLOAD_TIMEOUT_MS = 120000;
 // ─────────────────────────────────────────────────────────────────────────────
 export const getImageUrl = (path) => {
   if (!path) return null;
+  // Las URLs de un backend local se rehacen con la dirección del API (con su puerto): el proxy
+  // de desarrollo las devuelve sin puerto. 10.0.2.2 es la computadora vista desde el emulador.
   if (
     path.startsWith('http') &&
     !path.includes('localhost') &&
     !path.includes('127.0.0.1') &&
+    !path.includes('10.0.2.2') &&
     !path.includes('192.168.')
   ) {
     return path;
