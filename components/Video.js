@@ -10,12 +10,22 @@
  *
  * El estado que recibe onPlaybackStatusUpdate tiene los campos de antes que usa la app:
  * isLoaded, isPlaying, isBuffering, positionMillis, durationMillis y didJustFinish.
+ *
+ * `style` va a un View que envuelve al video, y el video lo llena al 100 %: con la arquitectura
+ * nueva, la vista de expo-video queda en 0 de alto si su tamaño sale solo de top/bottom
+ * (absoluteFill), como en Reels.
  */
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 
 const CONTENT_FIT = { contain: 'contain', cover: 'cover', stretch: 'fill' };
+
+const styles = StyleSheet.create({
+  // overflow: las esquinas redondeadas del estilo también recortan el video.
+  frame: { overflow: 'hidden' },
+  fill: { width: '100%', height: '100%' },
+});
 
 /**
  * Tamaño con el que se ve el video. En el celular sale de un cuadro del video, porque el de la
@@ -126,16 +136,17 @@ const Video = forwardRef(function Video({
   }), [player]);
 
   return (
-    <VideoView
-      // En Android, TextureView respeta las esquinas redondeadas y lo que se pone encima
-      // (controles, listas); SurfaceView, el de fábrica, no.
-      surfaceType="textureView"
-      {...viewProps}
-      player={player}
-      style={style}
-      contentFit={CONTENT_FIT[resizeMode] || 'contain'}
-      nativeControls={useNativeControls}
-    />
+    <View {...viewProps} style={[styles.frame, style]}>
+      <VideoView
+        // En Android, TextureView respeta las esquinas redondeadas y lo que se pone encima
+        // (controles, listas); SurfaceView, el de fábrica, no.
+        surfaceType="textureView"
+        player={player}
+        style={styles.fill}
+        contentFit={CONTENT_FIT[resizeMode] || 'contain'}
+        nativeControls={useNativeControls}
+      />
+    </View>
   );
 });
 

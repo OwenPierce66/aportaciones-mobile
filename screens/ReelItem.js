@@ -69,6 +69,9 @@ const ReelItemComponent = ({
   const [playbackStatus, setPlaybackStatus] = useState({});
   // Forma real del reel en pantalla (para decidir si cada clip la llena).
   const [boxRatio, setBoxRatio] = useState(windowWidth / windowHeight);
+  // Alto real del reel. Los clips van en un ScrollView horizontal, y ahí height: '100%' da 0
+  // desde RN 0.74 (Yoga 3): sin alto fijo, el video y la foto no se ven.
+  const [boxHeight, setBoxHeight] = useState(windowHeight);
 
   const VIEW_ORDER = ["main", "factores", "fuentes"];
   const fallbackMode = VIEW_ORDER.find((m) => (playlists?.[m]?.length || 0) > 0) || "main";
@@ -156,7 +159,10 @@ const ReelItemComponent = ({
       style={styles.reelContainer}
       onLayout={(event) => {
         const { width, height } = event.nativeEvent.layout;
-        if (width > 0 && height > 0) setBoxRatio(width / height);
+        if (width > 0 && height > 0) {
+          setBoxRatio(width / height);
+          setBoxHeight(height);
+        }
       }}
     >
       {/* 🔄 SWIPE HORIZONTAL NATIVO CLÁSICO */}
@@ -176,7 +182,7 @@ const ReelItemComponent = ({
       >
         {list.length > 0 ? (
           list.map((entry, clipIdx) => (
-            <View key={`${item.id}-clip-${clipIdx}`} style={{ width: windowWidth, height: '100%' }}>
+            <View key={`${item.id}-clip-${clipIdx}`} style={{ width: windowWidth, height: boxHeight }}>
               <ReelClipMedia
                 type={entry.type === 'image' ? 'image' : 'video'}
                 uri={getImageUrl(entry.src)}
@@ -193,7 +199,7 @@ const ReelItemComponent = ({
             </View>
           ))
         ) : (
-          <View style={{ width: windowWidth, height: '100%' }}> 
+          <View style={{ width: windowWidth, height: boxHeight }}>
             {/* Sin lista de clips: el video principal (la primera referencia). */}
             <ReelClipMedia
               type="video"

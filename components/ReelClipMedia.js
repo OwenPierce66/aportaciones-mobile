@@ -45,7 +45,9 @@ const ReelClipMedia = ({ type, uri, boxRatio, videoRef, videoProps }) => {
 };
 
 const styles = StyleSheet.create({
-  media: { ...StyleSheet.absoluteFillObject },
+  // Ancho y alto explícitos: con la arquitectura nueva, la foto de expo-image queda en 0 de alto
+  // si su tamaño sale solo de top/bottom (absoluteFill).
+  media: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
   video: { backgroundColor: '#000' },
   backdropShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
 });

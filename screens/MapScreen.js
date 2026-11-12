@@ -69,7 +69,9 @@ const MapScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { ...StyleSheet.absoluteFillObject },
+  // Ancho y alto explícitos: con la arquitectura nueva, MapView queda en 0 de alto si su tamaño
+  // sale solo de top/bottom (absoluteFill).
+  map: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
 });
 
 export default MapScreen;
